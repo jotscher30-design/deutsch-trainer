@@ -128,3 +128,23 @@ input[type=search], input[type=text], select { width: 100%; font: inherit; paddi
 .fact { background: var(--soft); border-radius: 14px; padding: 14px; font-size: 15px; }
 .fact b { display: block; margin-bottom: 4px; }
 .emoji { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+
+/* ───── Seit 08.10.2026: Fächer, Formeln, Skizzen ───── */
+body[data-subj="ph"] { --accent: #1971c2; }
+.seg.subj { padding: 4px; }
+.seg.subj button { padding: 10px 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.badge { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; line-height: 18px; }
+.pill.focus { background: color-mix(in srgb, var(--accent) 18%, var(--card)); color: var(--accent); }
+.news { border-color: var(--accent); }
+.qcard .qtext { font-size: 19px; font-weight: 600; line-height: 1.45; }
+.answer .ans, .cardrow .ans { font-size: 18px; font-weight: 600; line-height: 1.5; }
+.cardrow .ans { margin-bottom: 6px; }
+.lab { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin: 10px 0 3px; }
+.cardrow .t .sub { display: block; font-weight: 400; color: var(--muted); font-size: 15px; margin-top: 3px; }
+.fig { display: block; width: 100%; max-width: 320px; margin: 14px auto 0; }
+.katex { font-size: 1.08em; }
+.opt .katex { font-size: 1.12em; }
+.opt { line-height: 1.5; }
+.toggle.col { flex-direction: column; align-items: stretch; gap: 8px; }
+.seg.tri button { font-size: 14px; padding: 7px 4px; }
+.practice { margin-top: 10px; padding: 10px; font-size: 15px; }
