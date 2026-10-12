@@ -5,7 +5,7 @@
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 2;
+  const NEWS = 3;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -62,6 +62,8 @@
     return defaults();
   }
   let S = load();
+  // Einmalig (12.10.2026): Physik auf Symbole + eigene Formeln fokussieren, übrige Themen pausieren (Fortschritt bleibt)
+  if ((S.mig || 0) < 3) { for (const d of DECKS_PH) S.set.ph.decks[d.id] = d.def; S.mig = 3; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
@@ -261,9 +263,9 @@
       ${subjSwitch()}
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: Physik + neuer Deutsch-Schwerpunkt</b></p>
-        <p class="muted small" style="margin:0 0 6px">Physik: ${CARDS_PH.length} Karten nach Lehrplan 12 – Konstanten, E-Feld, Kondensator zuerst, dazu Zufallsaufgaben mit immer neuen Zahlen. Oben zwischen den Fächern wechseln.</p>
-        <p class="muted small" style="margin:0 0 10px">Deutsch: Stilmittel, Argumentation und Epochen stark ausgebaut und im Fokus, Sprachtheorie pausiert. Dein Fortschritt ist übernommen. Ändern unter „Mehr“.</p>
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu in Physik: Symbole + deine Formeln</b></p>
+        <p class="muted small" style="margin:0 0 6px">Physik fragt jetzt nur noch ab, was du gerade richtig gut können willst: alle Symbole (Zeichen, Name, Einheit, Bedeutung) und genau die 11 Formeln aus deiner Übersicht – beide im Fokus.</p>
+        <p class="muted small" style="margin:0 0 10px">Die übrigen Physik-Themen sind pausiert, dein Fortschritt dort bleibt. Wieder anschalten unter „Mehr“.</p>
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       <div class="box center">
         ${ring(h.r, goal)}

@@ -9,12 +9,14 @@
  * Mehrzeilige Antworten: Zeilen mit L(…) verbinden – eine Regel pro Zeile.
  */
 const DECKS_PH = [
-  { id: 'pk', name: 'Konstanten & Größenordnungen',     short: 'Konstanten', color: '#c92a2a', q: 'Wert?', def: 2 },
-  { id: 'pe', name: 'Elektrisches Feld',                short: 'E-Feld',     color: '#1971c2', q: 'Frage', def: 2 },
-  { id: 'pc', name: 'Kondensator',                      short: 'Kondensator', color: '#0c8599', q: 'Frage', def: 2 },
-  { id: 'pg', name: 'Werkzeuge: Einheiten, Potenzen, Basics', short: 'Werkzeuge', color: '#5c6370', q: 'Frage', def: 1 },
-  { id: 'pt', name: 'Teilchen im E-Feld & Relativistik', short: 'Teilchen',  color: '#5f3dc4', q: 'Frage', def: 1 },
-  { id: 'pm', name: 'Magnetfeld & Lorentzkraft',        short: 'B-Feld',     color: '#e8590c', q: 'Frage', def: 1 },
+  { id: 'ps', name: 'Symbole: Zeichen, Name, Einheit', short: 'Symbole', color: '#2b8a3e', q: 'Frage', def: 2 },
+  { id: 'pf', name: 'Meine Formeln (Übersicht E-Feld)', short: 'Meine Formeln', color: '#d6336c', q: 'Frage', def: 2 },
+  { id: 'pk', name: 'Konstanten & Größenordnungen',     short: 'Konstanten', color: '#c92a2a', q: 'Wert?', def: 0 },
+  { id: 'pe', name: 'Elektrisches Feld',                short: 'E-Feld',     color: '#1971c2', q: 'Frage', def: 0 },
+  { id: 'pc', name: 'Kondensator',                      short: 'Kondensator', color: '#0c8599', q: 'Frage', def: 0 },
+  { id: 'pg', name: 'Werkzeuge: Einheiten, Potenzen, Basics', short: 'Werkzeuge', color: '#5c6370', q: 'Frage', def: 0 },
+  { id: 'pt', name: 'Teilchen im E-Feld & Relativistik', short: 'Teilchen',  color: '#5f3dc4', q: 'Frage', def: 0 },
+  { id: 'pm', name: 'Magnetfeld & Lorentzkraft',        short: 'B-Feld',     color: '#e8590c', q: 'Frage', def: 0 },
   { id: 'pi', name: 'Induktion & Schwingkreis (12.2)',  short: 'Induktion',  color: '#2f9e44', q: 'Frage', def: 0 },
   { id: 'pw', name: 'Elektromagnetische Wellen (12.3)', short: 'Wellen',     color: '#9c36b5', q: 'Frage', def: 0 },
 ];
@@ -80,7 +82,111 @@ const CARDS_PH = (() => {
     return `<svg viewBox="0 0 260 182" class="fig" role="img" aria-label="Skizze">${g}${p ? particle(130, 88, p) : ''}</svg>`;
   }
 
+  /* ───────────── SYMBOLE (Zeichen · Name · Einheit · Bedeutung) ─────────────
+   * Grundlage: Symboltabelle der Formelübersicht E-Feld (12.10.2026).
+   * Pro Zeichen zwei Karten: Zeichen → Name + Bedeutung, Name → Zeichen + Einheit.
+   * Falsche Antworten kommen bevorzugt aus den Verwechslungs-Paaren (cf). */
+  const SYM = [
+    { k:'Q',    z:T`Q`,                  n:'Ladung (felderzeugend)',       u:T`\mathrm{C}`, un:'Coulomb', b:'Die Ladung, die das Feld erzeugt.', cf:['q','e','C'] },
+    { k:'q',    z:T`q,\ q_\text{p}`,     n:'Probeladung',                  u:T`\mathrm{C}`, un:'Coulomb', b:'Die Ladung, die im Feld bewegt wird bzw. auf die die Kraft wirkt.', cf:['Q','e','N'] },
+    { k:'e',    z:T`e`,                  n:'Elementarladung',              u:T`\mathrm{C}`, un:'Coulomb', b:T`Kleinste Ladung (Elektron, Proton): $e = 1{,}6022 \cdot 10^{-19}\,\mathrm{C}$.`, cf:['E','Epot','q'] },
+    { k:'N',    z:T`N`,                  n:'Anzahl',                       u:'', un:'ohne Einheit', b:T`Wie viele Elementarladungen es sind ($Q = N \cdot e$).`, cf:['e','Q','I'] },
+    { k:'I',    z:T`I`,                  n:'Stromstärke',                  u:T`\mathrm{A} = \dfrac{\mathrm{C}}{\mathrm{s}}`, un:'Ampère', b:'Wie viel Ladung pro Sekunde durch den Leiter fließt.', cf:['U','Q','t'] },
+    { k:'t',    z:T`t,\ \Delta t`,       n:'Zeit',                         u:T`\mathrm{s}`, un:'Sekunde', b:T`Zeitdauer, z. B. in $I = \dfrac{\Delta Q}{\Delta t}$.`, cf:['s','I','d'] },
+    { k:'Fel',  z:T`F_\text{el}`,        n:'elektrische Kraft',            u:T`\mathrm{N}`, un:'Newton', b:T`Kraft auf eine Ladung im elektrischen Feld ($F_\text{el} = q \cdot E$).`, cf:['FC','FG','E'] },
+    { k:'FC',   z:T`F_\text{C}`,         n:'Coulomb-Kraft',                u:T`\mathrm{N}`, un:'Newton', b:'Kraft zwischen zwei Punktladungen.', cf:['Fel','FGrav','C'] },
+    { k:'FG',   z:T`F_\text{G}`,         n:'Gewichtskraft',                u:T`\mathrm{N}`, un:'Newton', b:T`Kraft der Erde auf eine Masse: $F_\text{G} = m \cdot g$.`, cf:['FGrav','Fel','G'] },
+    { k:'FGrav',z:T`F_\text{Grav}`,      n:'Gravitationskraft',            u:T`\mathrm{N}`, un:'Newton', b:'Anziehungskraft zwischen zwei Massen (allgemein, nicht nur an der Erde).', cf:['FG','FC','G'] },
+    { k:'E',    z:T`\vec{E}`,            n:'elektrische Feldstärke',       u:T`\dfrac{\mathrm{N}}{\mathrm{C}} = \dfrac{\mathrm{V}}{\mathrm{m}}`, un:'Newton pro Coulomb', b:'Kraft pro Ladung an einem Punkt – ein Vektor (Betrag und Richtung).', cf:['Epot','e','Fel'] },
+    { k:'Epot', z:T`E_\text{pot}`,       n:'potentielle Energie',          u:T`\mathrm{J}`, un:'Joule', b:'Lageenergie einer Ladung im Feld. Hat nichts mit der Feldstärke zu tun.', cf:['E','W','phi'] },
+    { k:'W',    z:T`W`,                  n:'Arbeit',                       u:T`\mathrm{J}`, un:'Joule', b:'Energie, die übertragen wird, z. B. beim Verschieben einer Ladung.', cf:['Epot','U','V'] },
+    { k:'U',    z:T`U`,                  n:'Spannung',                     u:T`\mathrm{V} = \dfrac{\mathrm{J}}{\mathrm{C}}`, un:'Volt', b:'Differenz zweier Potentiale – Energie pro Ladung zwischen ZWEI Punkten.', cf:['phi','W','V'] },
+    { k:'phi',  z:T`\varphi`,            n:'Potential',                    u:T`\mathrm{V}`, un:'Volt', b:'Energie pro Ladung an EINEM Punkt. Nullpunkt frei wählbar.', cf:['U','rho','Epot'] },
+    { k:'d',    z:T`d`,                  n:'Plattenabstand',               u:T`\mathrm{m}`, un:'Meter', b:'Der ganze Abstand zwischen den Kondensatorplatten.', cf:['x','r','s'] },
+    { k:'x',    z:T`x,\ \Delta x`,       n:'Strecke längs der Feldlinie',  u:T`\mathrm{m}`, un:'Meter', b:T`Teilstrecke im Feld – nur ein Teil von $d$.`, cf:['d','s','r'] },
+    { k:'r',    z:T`r`,                  n:'Abstand der Mittelpunkte',     u:T`\mathrm{m}`, un:'Meter', b:'Abstand zwischen zwei Punktladungen bzw. Massen (Mitte zu Mitte).', cf:['d','x','s'] },
+    { k:'s',    z:T`s`,                  n:'Weg',                          u:T`\mathrm{m}`, un:'Meter', b:T`Allgemeiner Weg, z. B. in $W = F \cdot s$.`, cf:['d','x','t'] },
+    { k:'C',    z:T`C`,                  n:'Kapazität',                    u:T`\mathrm{F} = \dfrac{\mathrm{C}}{\mathrm{V}}`, un:'Farad', b:'Wie viel Ladung ein Kondensator pro Volt speichert.', cf:['Q','FC','A'] },
+    { k:'A',    z:T`A`,                  n:'Plattenfläche',                u:T`\mathrm{m^2}`, un:'Quadratmeter', b:'Fläche einer Kondensatorplatte.', cf:['C','I','d'] },
+    { k:'eps0', z:T`\varepsilon_0`,      n:'elektrische Feldkonstante',    u:T`\dfrac{\mathrm{As}}{\mathrm{Vm}}`, un:'Amperesekunde pro Voltmeter', b:T`Naturkonstante: $\varepsilon_0 = 8{,}854 \cdot 10^{-12}\,\dfrac{\mathrm{As}}{\mathrm{Vm}}$.`, cf:['epsr','G','e'] },
+    { k:'epsr', z:T`\varepsilon_r`,      n:'Dielektrizitätszahl',          u:'', un:'ohne Einheit', b:'Faktor für das Material zwischen den Platten. Luft ≈ 1.', cf:['eps0','rho','N'] },
+    { k:'G',    z:T`G`,                  n:'Gravitationskonstante',        u:T`\dfrac{\mathrm{m^3}}{\mathrm{kg} \cdot \mathrm{s^2}}`, un:'', b:T`Naturkonstante: $G = 6{,}67 \cdot 10^{-11}\,\dfrac{\mathrm{m^3}}{\mathrm{kg} \cdot \mathrm{s^2}}$.`, cf:['g','eps0','FG'] },
+    { k:'m',    z:T`m`,                  n:'Masse',                        u:T`\mathrm{kg}`, un:'Kilogramm', b:'Masse eines Körpers.', cf:['q','rho','g'] },
+    { k:'g',    z:T`g`,                  n:'Ortsfaktor',                   u:T`\dfrac{\mathrm{N}}{\mathrm{kg}}`, un:'Newton pro Kilogramm', b:T`Nahe der Erde $g = 9{,}81\,\dfrac{\mathrm{N}}{\mathrm{kg}}$ – entspricht $E$ im elektrischen Feld.`, cf:['G','E','m'] },
+    { k:'h',    z:T`h,\ \Delta h`,       n:'Höhe',                         u:T`\mathrm{m}`, un:'Meter', b:T`Höhe im Gravitationsfeld – entspricht $x$ im elektrischen Feld.`, cf:['x','d','phi'] },
+    { k:'rho',  z:T`\rho`,               n:'Dichte',                       u:T`\dfrac{\mathrm{kg}}{\mathrm{m^3}}`, un:'Kilogramm pro Kubikmeter', b:T`Masse pro Volumen: $m = \rho \cdot V$. Nicht mit $\varphi$ verwechseln.`, cf:['phi','m','V'] },
+    { k:'V',    z:T`V`,                  n:'Volumen',                      u:T`\mathrm{m^3}`, un:'Kubikmeter', b:T`Rauminhalt. Kursives $V$ = Volumen, aufrechtes $\mathrm{V}$ = Volt (Einheit).`, cf:['U','W','rho'] },
+    { k:'alpha',z:T`\alpha`,             n:'Winkel',                       u:T`^\circ`, un:'Grad', b:'Winkel, z. B. Auslenkung des Pendels.', cf:['phi','epsr','A'] },
+  ];
+  const SY = Object.fromEntries(SYM.map(s => [s.k, s]));
+  const fillWrong = (s, f) => {
+    const out = [], seen = new Set([f(s)]);
+    for (const k of [...s.cf, ...SYM.map(x => x.k).sort(() => Math.random() - 0.5)]) {
+      const v = f(SY[k]); if (k !== s.k && !seen.has(v)) { seen.add(v); out.push(v); } if (out.length === 3) break;
+    }
+    return out;
+  };
+  const unitTxt = s => s.u ? `Einheit $${s.u}$${s.un ? ` (${s.un})` : ''}` : 'ohne Einheit';
+  // erst alle Richtung-a-Karten, dann alle b-Karten – sonst verrät die zweite Karte die erste am selben Tag
+  const SYMCARDS = [0, 1].flatMap(dir => SYM.map(s => [
+    { id:`ph-s-${s.k}-a`, deck:'ps', ql:'Zeichen', q:`Was bedeutet das Zeichen $${s.z}$?`, term:s.n,
+      get wrong() { return fillWrong(s, x => x.n); },
+      def:L(s.b, unitTxt(s)) },
+    { id:`ph-s-${s.k}-b`, deck:'ps', ql:'Zeichen + Einheit', q:`Zeichen und Einheit: ${s.n}`, term:`$${s.z}$ · ${s.u ? `$${s.u}$` : 'ohne Einheit'}`,
+      get wrong() { return fillWrong(s, x => `$${x.z}$ · ${x.u ? `$${x.u}$` : 'ohne Einheit'}`); },
+      def:s.b },
+  ][dir]));
+
+  /* ───────────── MEINE FORMELN (genau Jonas' handgeschriebene Übersicht, 12.10.2026) ───────────── */
+  const FORM = [
+    { k:'E',    f:T`\vec{E} = \dfrac{\vec{F}}{q}`, w:'die elektrische Feldstärke – „Kraft pro Probeladung"',
+      bad:[T`\vec{E} = \vec{F} \cdot q`, T`\vec{E} = \dfrac{q}{\vec{F}}`, T`E = \dfrac{W}{q}`],
+      def:L('Brauchst du: wenn die Kraft auf eine bekannte Probeladung gegeben ist.', T`Woher: Definition – $F$ wächst mit $q$, also ist $\dfrac{F}{q}$ am selben Ort immer gleich.`) },
+    { k:'Fel',  f:T`F_\text{el} = q \cdot E`, w:'die Kraft auf eine Ladung im elektrischen Feld',
+      bad:[T`F_\text{el} = \dfrac{E}{q}`, T`F_\text{el} = \dfrac{q}{E}`, T`F_\text{el} = q \cdot U`],
+      def:L('Brauchst du: fast immer – schwebende Ladung, Pendel, Teilchen beschleunigen.', 'Woher: die Definition der Feldstärke umgestellt.'),
+      fx:'Achtung: In deiner Übersicht steht daneben „Elektr. Feldstärke" – berechnet wird aber die KRAFT.' },
+    { k:'FC',   f:T`F_\text{C} = \dfrac{1}{4\pi\varepsilon_0} \cdot \dfrac{Q_1 \cdot Q_2}{r^2}`, w:'die Kraft zwischen zwei Punktladungen (Coulomb-Gesetz)',
+      bad:[T`F_\text{C} = \dfrac{1}{4\pi\varepsilon_0} \cdot \dfrac{Q_1 \cdot Q_2}{r}`, T`F_\text{C} = 4\pi\varepsilon_0 \cdot \dfrac{Q_1 \cdot Q_2}{r^2}`, T`F_\text{C} = \dfrac{1}{4\pi\varepsilon_0} \cdot \dfrac{Q_1 + Q_2}{r^2}`],
+      def:L(T`Brauchst du: zwei geladene Kugeln/Teilchen im Abstand $r$ (Mitte zu Mitte).`, 'Gleichnamig stößt ab, ungleichnamig zieht an – Beträge einsetzen, Richtung aus der Skizze.'),
+      fx:T`$r$ steht im Quadrat: doppelter Abstand → ein Viertel der Kraft.` },
+    { k:'FGrav',f:T`F_\text{Grav} = G \cdot \dfrac{m_1 \cdot m_2}{r^2}`, w:'die Anziehungskraft zwischen zwei Massen',
+      bad:[T`F_\text{Grav} = G \cdot \dfrac{m_1 \cdot m_2}{r}`, T`F_\text{Grav} = G \cdot \dfrac{m_1 + m_2}{r^2}`, T`F_\text{Grav} = \dfrac{m_1 \cdot m_2}{G \cdot r^2}`],
+      def:L('Brauchst du: hier zum Vergleich mit der Coulomb-Kraft (Protonen-Aufgabe).', 'Woher: Newtons Gravitationsgesetz – gleicher Aufbau wie Coulomb.') },
+    { k:'W',    f:T`W = F \cdot s`, w:'die Arbeit, wenn eine Ladung verschoben wird',
+      bad:[T`W = \dfrac{F}{s}`, T`W = \dfrac{s}{F}`, T`W = F \cdot t`],
+      def:L('Brauchst du: Ladung wird im homogenen Feld verschoben.', T`Gilt nur, wenn $F$ konstant und parallel zu $s$ ist.`) },
+    { k:'U',    f:T`U = \dfrac{W}{q}`, w:'die Spannung zwischen zwei Punkten',
+      bad:[T`U = W \cdot q`, T`U = \dfrac{q}{W}`, T`U = \dfrac{F}{q}`],
+      def:L('Brauchst du: wenn Arbeit und Ladung gegeben sind.', 'Woher: Definition – Spannung = Energie pro Ladung. 1 V = 1 J pro Coulomb.') },
+    { k:'Wq',   f:T`W = q \cdot U`, w:'die Energie, die die Ladung gewinnt oder abgibt',
+      bad:[T`W = \dfrac{q}{U}`, T`W = \dfrac{U}{q}`, T`W = q \cdot E`],
+      def:L('Brauchst du: Ladung von Platte zu Platte bringen; später Elektronen beschleunigen.', T`Woher: $U = \dfrac{W}{q}$ umgestellt.`) },
+    { k:'EUd',  f:T`E = \dfrac{U}{d}`, w:'die Feldstärke in einem Plattenkondensator',
+      bad:[T`E = U \cdot d`, T`E = \dfrac{d}{U}`, T`E = \dfrac{U}{q}`],
+      def:L(T`Brauchst du: sehr oft – $U$ und $d$ kann man messen, $E$ nicht direkt.`, 'Gilt nur im homogenen Feld.'),
+      fx:T`Herleitung: $q \cdot E \cdot d = W = q \cdot U$ → $E = \dfrac{U}{d}$.` },
+    { k:'dEpot',f:T`\Delta E_\text{pot} = q \cdot E \cdot \Delta x`, w:T`wie stark sich die potentielle Energie ändert, wenn $q$ um $\Delta x$ längs der Feldlinie wandert`,
+      bad:[T`\Delta E_\text{pot} = \dfrac{q \cdot E}{\Delta x}`, T`\Delta E_\text{pot} = q \cdot U \cdot \Delta x`, T`\Delta E_\text{pot} = \dfrac{E \cdot \Delta x}{q}`],
+      def:L(T`Brauchst du: wenn nur eine Teilstrecke im Kondensator gefragt ist (nicht ganz $d$).`, T`Woher: $W = F \cdot s$ mit $F = q \cdot E$ – wie $m \cdot g \cdot \Delta h$.`) },
+    { k:'phi',  f:T`\varphi = \dfrac{E_\text{pot}}{q}`, w:'das Potential an einem Punkt – Energie pro Ladung dort',
+      bad:[T`\varphi = E_\text{pot} \cdot q`, T`\varphi = \dfrac{q}{E_\text{pot}}`, T`\varphi = \dfrac{E}{q}`],
+      def:L('Brauchst du: Doppelkondensator, Potentialverlauf, Äquipotentiallinien.', 'Wie die „Höhe" im Gravitationsfeld. Nullpunkt frei wählbar.'),
+      fx:T`Schreib $\varphi$ mit Strich durch den Kreis – sonst sieht es aus wie $\rho$ (Dichte).` },
+    { k:'UAB',  f:T`U_{AB} = \varphi_B - \varphi_A`, w:'die Spannung zwischen A und B aus zwei Potentialen',
+      bad:[T`U_{AB} = \varphi_A - \varphi_B`, T`U_{AB} = \varphi_A + \varphi_B`, T`U_{AB} = \dfrac{\varphi_B}{\varphi_A}`],
+      def:'Brauchst du: wenn Potentiale gegeben sind oder du sie ausgerechnet hast.',
+      fx:'Schreibweise deines Buchs: B minus A. Andere Quellen drehen es um – in der Schulaufgabe so wie im Buch.' },
+  ];
+  const FORMCARDS = [0, 1].flatMap(dir => FORM.map((x, i) => [
+    { id:`ph-f-${x.k}-a`, deck:'pf', ql:'Formel', q:`Formel für ${x.w}`, term:`$${x.f}$`, wrong:x.bad.map(b => `$${b}$`), def:x.def, fx:x.fx },
+    { id:`ph-f-${x.k}-b`, deck:'pf', ql:'Was berechnet sie?', q:`Was berechnet $${x.f}$?`, term:x.w.charAt(0).toUpperCase() + x.w.slice(1),
+      get wrong() { const o = FORM.filter((_, j) => j !== i).sort(() => Math.random() - 0.5).slice(0, 3); return o.map(y => y.w.charAt(0).toUpperCase() + y.w.slice(1)); },
+      def:x.def, fx:x.fx },
+  ][dir]));
+
   return [
+    ...SYMCARDS, ...FORMCARDS,
     /* ───────────── KONSTANTEN & GRÖSSENORDNUNGEN ───────────── */
     { id:'ph-k01', deck:'pk', q:T`Elementarladung $e$`, term:T`$e = 1{,}602 \cdot 10^{-19}\,\mathrm{C}$`,
       wrong:[T`$e = 1{,}602 \cdot 10^{-31}\,\mathrm{C}$`, T`$e = 9{,}11 \cdot 10^{-19}\,\mathrm{C}$`, T`$e = 1{,}602 \cdot 10^{19}\,\mathrm{C}$`, T`$e = 6{,}24 \cdot 10^{-18}\,\mathrm{C}$`],
