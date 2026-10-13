@@ -5,7 +5,7 @@
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 3;
+  const NEWS = 4;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -64,6 +64,8 @@
   let S = load();
   // Einmalig (12.10.2026): Physik auf Symbole + eigene Formeln fokussieren, übrige Themen pausieren (Fortschritt bleibt)
   if ((S.mig || 0) < 3) { for (const d of DECKS_PH) S.set.ph.decks[d.id] = d.def; S.mig = 3; }
+  // 13.10.2026: neue Physik-Themen Einheiten, Gültige Ziffern, Umrechnen einschalten
+  if (S.mig < 4) { for (const id of ['ps', 'pu', 'pf', 'pz', 'pv']) S.set.ph.decks[id] = 2; S.mig = 4; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
@@ -148,10 +150,16 @@
   let sess = null;
   function buildSession({ extra = false, deck = null } = {}) {
     const k = K(), items = [];
-    if (deck) { // nur ein Thema üben (z. B. vor der Klausur)
-      const all = SUBJ[k].cards.filter(c => c.deck === deck);
-      shuffle(all.filter(c => S.cards[c.id])).slice(0, 12).forEach(card => items.push({ card, mode: modeFor(card, k), extra: true }));
-      const fresh = all.filter(c => !S.cards[c.id]).slice(0, Math.min(6, Math.max(0, 12 - items.length)));
+    if (deck) { // nur ein Thema abfragen
+      const all = SUBJ[k].cards.filter(c => c.deck === deck), t = today();
+      const due = all.filter(c => S.cards[c.id] && S.cards[c.id].due <= t);
+      shuffle(due).slice(0, 20).forEach(card => items.push({ card, mode: modeFor(card, k) }));
+      const rest = shuffle(all.filter(c => S.cards[c.id] && S.cards[c.id].due > t && !c.gen));
+      rest.slice(0, Math.max(0, 12 - items.length)).forEach(card => items.push({ card, mode: modeFor(card, k), extra: true }));
+      const gens = all.filter(c => c.gen && S.cards[c.id]);
+      for (let i = 0; gens.length && items.length < 12 && i < 30; i++) items.push({ card: gens[i % gens.length], mode: 'mc', extra: true });
+      shuffle(items);
+      const fresh = all.filter(c => !S.cards[c.id]).slice(0, 6);
       fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, { card, mode: 'learn' }));
     } else if (extra) {
       const seen = enabled(k).filter(c => S.cards[c.id]);
@@ -263,9 +271,9 @@
       ${subjSwitch()}
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu in Physik: Symbole + deine Formeln</b></p>
-        <p class="muted small" style="margin:0 0 6px">Physik fragt jetzt nur noch ab, was du gerade richtig gut können willst: alle Symbole (Zeichen, Name, Einheit, Bedeutung) und genau die 11 Formeln aus deiner Übersicht – beide im Fokus.</p>
-        <p class="muted small" style="margin:0 0 10px">Die übrigen Physik-Themen sind pausiert, dein Fortschritt dort bleibt. Wieder anschalten unter „Mehr“.</p>
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu in Physik: Themen einzeln abfragen</b></p>
+        <p class="muted small" style="margin:0 0 6px">Unten auf dieser Seite: „Einzeln abfragen" – tippe ein Thema an, dann kommt nur das dran. Formelzeichen fragen jetzt immer Name UND Einheit ab.</p>
+        <p class="muted small" style="margin:0 0 10px">Neue Themen: Einheiten · Gültige Ziffern (mit deinen Heft-Beispielen) · Grundeinheiten umrechnen – dort gibt es Zufallsaufgaben mit immer neuen Zahlen.</p>
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       <div class="box center">
         ${ring(h.r, goal)}
@@ -281,6 +289,9 @@
         <div class="stat"><b>${enabled().filter(c => S.cards[c.id]).length}</b><span>gesehen</span></div>
         <div class="stat"><b>${mastered()}</b><span>sitzen</span></div>
       </div>
+      <h2>Einzeln abfragen</h2>
+      <div class="chips">${cur().decks.filter(d => conf().decks[d.id] > 0).map(d => { const all = SUBJ[k].cards.filter(c => c.deck === d.id), du = all.filter(c => S.cards[c.id] && S.cards[c.id].due <= t).length, nw = all.filter(c => !S.cards[c.id]).length;
+        return `<button class="chip" data-deck="${d.id}"><b>${d.short}</b><span>${du ? `${du} fällig` : nw ? `${nw} neu` : 'üben'}</span></button>`; }).join('')}</div>
       ${focus.length ? `<p class="muted small" style="margin-top:12px">Fokus: <b>${focus.join(' · ')}</b> – <a href="#" id="chg">ändern</a></p>` : ''}
       ${S.set.ifthen ? `<div class="box ifthen"><p class="small muted" style="margin:0">Dein Plan</p><p style="margin:0"><b>${esc(S.set.ifthen)}</b>, dann mache ich meine Abfrage.</p></div>` : ''}
       <h2>Letzte 12 Wochen</h2>
@@ -289,6 +300,7 @@
     const x = $('#extra'); if (x) x.onclick = () => startSession({ extra: true });
     const n = $('#newsok'); if (n) n.onclick = () => { S.news = NEWS; save(); render(); };
     const c = $('#chg'); if (c) c.onclick = e => { e.preventDefault(); go('settings'); };
+    app.querySelectorAll('.chip[data-deck]').forEach(b => b.onclick = () => startSession({ deck: b.dataset.deck }));
   }
 
   function startSession(opts) {
@@ -394,8 +406,10 @@
       </div>
       <div class="fact"><b>${f[0]}</b>${f[1]}</div>
       <div style="margin-top:14px">
-        ${todo(k) ? `<button class="btn primary" id="more">Weiter abfragen</button>` : todo(other) ? `<button class="btn primary" id="switch">Weiter mit ${SUBJ[other].name} · ${todo(other)}</button>` : `<button class="btn" id="extra">Extra-Runde</button>`}
+        ${sess.deck ? `<button class="btn primary" id="again">Nochmal: ${deckOf(sess.deck).short}</button>` : ''}
+        ${todo(k) ? `<button class="btn ${sess.deck ? '' : 'primary'}" id="more">Weiter abfragen</button>` : todo(other) ? `<button class="btn primary" id="switch">Weiter mit ${SUBJ[other].name} · ${todo(other)}</button>` : `<button class="btn" id="extra">Extra-Runde</button>`}
         <button class="btn ghost" id="home">Fertig für heute</button></div>`;
+    const ag = $('#again'); if (ag) { const d = sess.deck; ag.onclick = () => startSession({ deck: d }); }
     const m = $('#more'); if (m) m.onclick = () => startSession();
     const sw = $('#switch'); if (sw) sw.onclick = () => { S.set.cur = other; save(); sess = null; startSession(); };
     const x = $('#extra'); if (x) x.onclick = () => startSession({ extra: true });

@@ -9,8 +9,11 @@
  * Mehrzeilige Antworten: Zeilen mit L(…) verbinden – eine Regel pro Zeile.
  */
 const DECKS_PH = [
-  { id: 'ps', name: 'Symbole: Zeichen, Name, Einheit', short: 'Symbole', color: '#2b8a3e', q: 'Frage', def: 2 },
+  { id: 'ps', name: 'Formelzeichen + Einheit', short: 'Formelzeichen', color: '#2b8a3e', q: 'Frage', def: 2 },
+  { id: 'pu', name: 'Einheiten', short: 'Einheiten', color: '#0b7285', q: 'Frage', def: 2 },
   { id: 'pf', name: 'Meine Formeln (Übersicht E-Feld)', short: 'Meine Formeln', color: '#d6336c', q: 'Frage', def: 2 },
+  { id: 'pz', name: 'Gültige Ziffern', short: 'Gültige Ziffern', color: '#e67700', q: 'Frage', def: 2 },
+  { id: 'pv', name: 'Grundeinheiten umrechnen', short: 'Umrechnen', color: '#5c940d', q: 'Frage', def: 2 },
   { id: 'pk', name: 'Konstanten & Größenordnungen',     short: 'Konstanten', color: '#c92a2a', q: 'Wert?', def: 0 },
   { id: 'pe', name: 'Elektrisches Feld',                short: 'E-Feld',     color: '#1971c2', q: 'Frage', def: 0 },
   { id: 'pc', name: 'Kondensator',                      short: 'Kondensator', color: '#0c8599', q: 'Frage', def: 0 },
@@ -126,13 +129,14 @@ const CARDS_PH = (() => {
     }
     return out;
   };
+  const nameUnit = x => `${x.n} · ${x.u ? `$${x.u}$` : 'ohne Einheit'}`;
   const unitTxt = s => s.u ? `Einheit $${s.u}$${s.un ? ` (${s.un})` : ''}` : 'ohne Einheit';
   // erst alle Richtung-a-Karten, dann alle b-Karten – sonst verrät die zweite Karte die erste am selben Tag
   const SYMCARDS = [0, 1].flatMap(dir => SYM.map(s => [
-    { id:`ph-s-${s.k}-a`, deck:'ps', ql:'Zeichen', q:`Was bedeutet das Zeichen $${s.z}$?`, term:s.n,
-      get wrong() { return fillWrong(s, x => x.n); },
-      def:L(s.b, unitTxt(s)) },
-    { id:`ph-s-${s.k}-b`, deck:'ps', ql:'Zeichen + Einheit', q:`Zeichen und Einheit: ${s.n}`, term:`$${s.z}$ · ${s.u ? `$${s.u}$` : 'ohne Einheit'}`,
+    { id:`ph-s-${s.k}-a`, deck:'ps', ql:'Zeichen → Name + Einheit', q:`Wofür steht $${s.z}$ – und welche Einheit?`, term:nameUnit(s),
+      get wrong() { return fillWrong(s, nameUnit); },
+      def:s.b },
+    { id:`ph-s-${s.k}-b`, deck:'ps', ql:'Name → Zeichen + Einheit', q:`Zeichen und Einheit: ${s.n}`, term:`$${s.z}$ · ${s.u ? `$${s.u}$` : 'ohne Einheit'}`,
       get wrong() { return fillWrong(s, x => `$${x.z}$ · ${x.u ? `$${x.u}$` : 'ohne Einheit'}`); },
       def:s.b },
   ][dir]));
@@ -185,8 +189,167 @@ const CARDS_PH = (() => {
       def:x.def, fx:x.fx },
   ][dir]));
 
+  /* ───────────── EINHEITEN (welche Größe? · umformen) ───────────── */
+  const UNITS = [
+    { k:'N',   u:T`\mathrm{N}`, g:'Kraft', zg:T`F`, eq:T`1\,\mathrm{N} = 1\,\dfrac{\mathrm{kg} \cdot \mathrm{m}}{\mathrm{s^2}}`, from:T`F = m \cdot a` ,
+      bad:[T`1\,\mathrm{N} = 1\,\dfrac{\mathrm{kg} \cdot \mathrm{m}}{\mathrm{s}}`, T`1\,\mathrm{N} = 1\,\mathrm{kg} \cdot \mathrm{m} \cdot \mathrm{s^2}`, T`1\,\mathrm{N} = 1\,\dfrac{\mathrm{kg}}{\mathrm{m} \cdot \mathrm{s^2}}`] },
+    { k:'J',   u:T`\mathrm{J}`, g:'Energie / Arbeit', zg:T`W,\ E_\text{pot}`, eq:T`1\,\mathrm{J} = 1\,\mathrm{N} \cdot \mathrm{m}`, from:T`W = F \cdot s`,
+      bad:[T`1\,\mathrm{J} = 1\,\dfrac{\mathrm{N}}{\mathrm{m}}`, T`1\,\mathrm{J} = 1\,\mathrm{N} \cdot \mathrm{s}`, T`1\,\mathrm{J} = 1\,\dfrac{\mathrm{V}}{\mathrm{C}}`] },
+    { k:'C',   u:T`\mathrm{C}`, g:'Ladung', zg:T`Q,\ q`, eq:T`1\,\mathrm{C} = 1\,\mathrm{A} \cdot \mathrm{s}`, from:T`Q = I \cdot t`,
+      bad:[T`1\,\mathrm{C} = 1\,\dfrac{\mathrm{A}}{\mathrm{s}}`, T`1\,\mathrm{C} = 1\,\dfrac{\mathrm{s}}{\mathrm{A}}`, T`1\,\mathrm{C} = 1\,\mathrm{V} \cdot \mathrm{A}`] },
+    { k:'A',   u:T`\mathrm{A}`, g:'Stromstärke', zg:T`I`, eq:T`1\,\mathrm{A} = 1\,\dfrac{\mathrm{C}}{\mathrm{s}}`, from:T`I = \dfrac{\Delta Q}{\Delta t}`,
+      bad:[T`1\,\mathrm{A} = 1\,\mathrm{C} \cdot \mathrm{s}`, T`1\,\mathrm{A} = 1\,\dfrac{\mathrm{s}}{\mathrm{C}}`, T`1\,\mathrm{A} = 1\,\dfrac{\mathrm{V}}{\mathrm{C}}`] },
+    { k:'V',   u:T`\mathrm{V}`, g:'Spannung / Potential', zg:T`U,\ \varphi`, eq:T`1\,\mathrm{V} = 1\,\dfrac{\mathrm{J}}{\mathrm{C}}`, from:T`U = \dfrac{W}{q}`,
+      bad:[T`1\,\mathrm{V} = 1\,\mathrm{J} \cdot \mathrm{C}`, T`1\,\mathrm{V} = 1\,\dfrac{\mathrm{C}}{\mathrm{J}}`, T`1\,\mathrm{V} = 1\,\dfrac{\mathrm{N}}{\mathrm{C}}`] },
+    { k:'Vm',  u:T`\dfrac{\mathrm{V}}{\mathrm{m}}`, g:'elektrische Feldstärke', zg:T`E`, eq:T`1\,\dfrac{\mathrm{V}}{\mathrm{m}} = 1\,\dfrac{\mathrm{N}}{\mathrm{C}}`, from:T`E = \dfrac{U}{d} \text{ und } E = \dfrac{F}{q}`,
+      bad:[T`1\,\dfrac{\mathrm{V}}{\mathrm{m}} = 1\,\mathrm{N} \cdot \mathrm{C}`, T`1\,\dfrac{\mathrm{V}}{\mathrm{m}} = 1\,\dfrac{\mathrm{C}}{\mathrm{N}}`, T`1\,\dfrac{\mathrm{V}}{\mathrm{m}} = 1\,\dfrac{\mathrm{J}}{\mathrm{m}}`] },
+    { k:'F',   u:T`\mathrm{F}`, g:'Kapazität', zg:T`C`, eq:T`1\,\mathrm{F} = 1\,\dfrac{\mathrm{C}}{\mathrm{V}}`, from:T`C = \dfrac{Q}{U}`,
+      bad:[T`1\,\mathrm{F} = 1\,\dfrac{\mathrm{V}}{\mathrm{C}}`, T`1\,\mathrm{F} = 1\,\mathrm{C} \cdot \mathrm{V}`, T`1\,\mathrm{F} = 1\,\dfrac{\mathrm{A}}{\mathrm{V}}`] },
+    { k:'Nkg', u:T`\dfrac{\mathrm{N}}{\mathrm{kg}}`, g:'Ortsfaktor', zg:T`g`, eq:T`1\,\dfrac{\mathrm{N}}{\mathrm{kg}} = 1\,\dfrac{\mathrm{m}}{\mathrm{s^2}}`, from:T`F_\text{G} = m \cdot g \text{ und } 1\,\mathrm{N} = 1\,\tfrac{\mathrm{kg\,m}}{\mathrm{s^2}}`,
+      bad:[T`1\,\dfrac{\mathrm{N}}{\mathrm{kg}} = 1\,\dfrac{\mathrm{m}}{\mathrm{s}}`, T`1\,\dfrac{\mathrm{N}}{\mathrm{kg}} = 1\,\mathrm{m} \cdot \mathrm{s^2}`, T`1\,\dfrac{\mathrm{N}}{\mathrm{kg}} = 1\,\dfrac{\mathrm{kg}}{\mathrm{s^2}}`] },
+    { k:'Pa',  u:T`\mathrm{Pa}`, g:'Druck', zg:T`p`, eq:T`1\,\mathrm{Pa} = 1\,\dfrac{\mathrm{N}}{\mathrm{m^2}}`, from:T`p = \dfrac{F}{A}`,
+      bad:[T`1\,\mathrm{Pa} = 1\,\mathrm{N} \cdot \mathrm{m^2}`, T`1\,\mathrm{Pa} = 1\,\dfrac{\mathrm{N}}{\mathrm{m}}`, T`1\,\mathrm{Pa} = 1\,\dfrac{\mathrm{m^2}}{\mathrm{N}}`] },
+    { k:'eps', u:T`\dfrac{\mathrm{As}}{\mathrm{Vm}}`, g:'elektrische Feldkonstante', zg:T`\varepsilon_0`, eq:null },
+    { k:'rho', u:T`\dfrac{\mathrm{kg}}{\mathrm{m^3}}`, g:'Dichte', zg:T`\rho`, eq:null },
+  ];
+  const UNITCARDS = [
+    ...UNITS.map((x, i) => ({ id:`ph-u-${x.k}-a`, deck:'pu', ql:'Einheit → Größe', q:`Welche Größe misst man in $${x.u}$?`, term:`${x.g} ($${x.zg}$)`,
+      get wrong() { return UNITS.filter((_, j) => j !== i).sort(() => Math.random() - 0.5).slice(0, 3).map(y => `${y.g} ($${y.zg}$)`); },
+      def: x.eq ? `$${x.eq}$` : '' })),
+    ...UNITS.filter(x => x.eq).map(x => ({ id:`ph-u-${x.k}-b`, deck:'pu', ql:'Einheit umformen', q:`Einheit umformen: $1\\,${x.u} = \\;?$ (${x.g})`, term:`$${x.eq}$`,
+      wrong: x.bad.map(b => `$${b}$`), def:`Herleitung aus $${x.from}$: Einheiten einsetzen.` })),
+  ];
+
+  /* ───────────── GÜLTIGE ZIFFERN ───────────── */
+  // Zahl mit genau n gültigen Ziffern als TeX (deutsches Komma, Nullen am Ende bleiben stehen)
+  const sig = (x, n, forceSci = false) => {
+    const [m, eRaw] = x.toExponential(n - 1).split('e'), e = +eRaw;
+    if (forceSci || e < -3 || e > 3) return e === 0 ? m.replace('.', '{,}') : `${m.replace('.', '{,}')} \\cdot 10^{${e}}`;
+    const s = x.toFixed(Math.max(0, n - 1 - e));
+    if (!s.includes('.') && s.replace('-', '').length > n) return `${m.replace('.', '{,}')} \\cdot 10^{${e}}`; // 1200 mit 3 GZ → 1,20·10³
+    return s.replace('.', '{,}');
+  };
+  const SIGRULES = L('Alle Ziffern außer Nullen zählen.', 'Nullen ZWISCHEN Ziffern zählen.', 'Nullen VORNE (0,00…) zählen nicht.', 'Nullen am ENDE hinter dem Komma zählen.', 'Die Zehnerpotenz zählt nicht.');
+  const SCEN = [ // [Formel, gesucht, Einheit, Angaben [Zeichen, Wert, Einheit-TeX], rechne, Konstanten-Hinweis]
+    () => ({ f:T`E = \dfrac{U}{d}`, g:'E', u:T`\tfrac{\mathrm{V}}{\mathrm{m}}`, a:[['U', pick([375, 235, 12.5, 4.5e3, 1.20e3]), T`\mathrm{V}`], ['d', pick([5.0e-3, 2.50e-2, 4e-3, 0.0120]), T`\mathrm{m}`]], c:(U, d) => U / d }),
+    () => ({ f:T`F = q \cdot E`, g:'F', u:T`\mathrm{N}`, a:[['q', pick([1.5e-7, 4.90e-11, 2.0e-9, 3.25e-8]), T`\mathrm{C}`], ['E', pick([6.5e4, 3.40e4, 1.25e5, 8e3]), T`\tfrac{\mathrm{V}}{\mathrm{m}}`]], c:(q, E) => q * E }),
+    () => ({ f:T`Q = C \cdot U`, g:'Q', u:T`\mathrm{C}`, a:[['C', pick([4.7e-8, 1.00e-9, 2.2e-10, 3.30e-6]), T`\mathrm{F}`], ['U', pick([12, 375, 9.0, 235]), T`\mathrm{V}`]], c:(C, U) => C * U }),
+    () => ({ f:T`N = \dfrac{Q}{e}`, g:'N', u:'', a:[['Q', pick([1.00, 2.5e-9, 4.80e-6, 0.050]), T`\mathrm{C}`]], c:Q => Q / 1.6022e-19, k:T`e = 1{,}6022 \cdot 10^{-19}\,\mathrm{C}` }),
+    () => ({ f:T`W = q \cdot U`, g:'W', u:T`\mathrm{J}`, a:[['q', pick([4.9e-11, 1.6022e-19, 2.00e-6, 3.5e-9]), T`\mathrm{C}`], ['U', pick([375, 1.5e3, 235, 24.0]), T`\mathrm{V}`]], c:(q, U) => q * U }),
+    () => ({ f:T`F_\text{G} = m \cdot g`, g:'F_\\text{G}', u:T`\mathrm{N}`, a:[['m', pick([0.030, 0.0250, 1.2, 75.0]), T`\mathrm{kg}`], ['g', 9.81, T`\tfrac{\mathrm{N}}{\mathrm{kg}}`]], c:(m, g) => m * g }),
+  ];
+  // Anzahl gültiger Ziffern eines Zahlwerts, wie er angegeben wird (Angabe = kleinste Darstellung ohne Nullen am Ende, außer explizit)
+  const GZ = { 375:3, 235:3, 24.0:3, 12.5:3, 4.5e3:2, 1.20e3:3, 5.0e-3:2, 2.50e-2:3, 4e-3:1, 0.0120:3, 1.5e-7:2, 4.90e-11:3, 2.0e-9:2, 3.25e-8:3, 6.5e4:2, 3.40e4:3, 1.25e5:3, 8e3:1,
+    4.7e-8:2, 1.00e-9:3, 2.2e-10:2, 3.30e-6:3, 12:2, 9.0:2, 1.00:3, 2.5e-9:2, 4.80e-6:3, 0.050:2, 1.6022e-19:5, 2.00e-6:3, 3.5e-9:2, 1.5e3:2, 0.030:2, 0.0250:3, 1.2:2, 75.0:3, 9.81:3 };
+  const angabe = (v) => sig(v, GZ[v]);
+  const scen = () => { const s = pick(SCEN)(); const vals = s.a.map(a => a[1]); const n = Math.min(...vals.map(v => GZ[v])); return { ...s, vals, n, r: s.c(...vals) }; };
+  const scenQ = s => `$${s.f}$ mit ` + s.a.map(a => `$${a[0]} = ${angabe(a[1])}\\,${a[2]}$`).join(', ') + (s.k ? ` (Konstante: $${s.k}$)` : '');
+
+  const SIGCARDS = [
+    ...[['3,5', 2], ['0,317', 3], ['0,00043', 2], ['0,37800', 5]].map(([z, n], i) => ({ id:`ph-z-heft${i + 1}`, deck:'pz', ql:'Aus deinem Heft', q:`Wie viele gültige Ziffern hat ${z}?`, term:String(n),
+      wrong: opts(String(n), [n + 1, n - 1, n + 2, n + 3].filter(x => x > 0).map(String)), def:SIGRULES })),
+    { id:'ph-z-r1', deck:'pz', q:'Auf wie viele gültige Ziffern rundest du das Ergebnis einer Rechnung?', term:'So viele wie die Angabe mit den WENIGSTEN gültigen Ziffern („immer kleinste GZ").',
+      wrong:['So viele wie die Angabe mit den meisten gültigen Ziffern.', 'Immer auf zwei Nachkommastellen.', 'So viele, wie der Taschenrechner anzeigt.'], def:'Steht so in deinem Heft (Wiederholung).', fx:'Zwischenergebnisse genauer lassen – erst am Ende runden.' },
+    { id:'ph-z-r2', deck:'pz', q:'„Nur die Größen der Formel sind wichtig" – was heißt das?', term:'Nur die gegebenen Messwerte bestimmen die gültigen Ziffern. Konstanten (e, ε₀) und exakte Zahlen (2, π) begrenzen nicht.',
+      wrong:['Auch Konstanten wie e zählen mit ihren Ziffern.', 'Nur das Ergebnis hat gültige Ziffern.', 'Die Einheit bestimmt die gültigen Ziffern.'], def:T`Beispiel aus deinem Heft: $Q = 1{,}00\,\mathrm{C}$ (3 GZ), $e = 1{,}6022 \cdot 10^{-19}\,\mathrm{C}$ (5 GZ) → $N = 6{,}24 \cdot 10^{18}$ (3 GZ).` },
+    { id:'ph-z-r3', deck:'pz', q:T`Zählt die Zehnerpotenz bei $6{,}24 \cdot 10^{18}$ mit?`, term:'Nein – 3 gültige Ziffern (6, 2, 4).', wrong:['Ja – 5 gültige Ziffern.', 'Ja – 21 gültige Ziffern.', 'Nein – 2 gültige Ziffern.'], def:SIGRULES },
+    { id:'ph-z-r4', deck:'pz', noMC:true, q:'Warum schreibt man „1200 m mit 3 gültigen Ziffern" als Zehnerpotenz?', term:T`Bei $1200$ ist unklar, ob die Nullen gemessen sind. $1{,}20 \cdot 10^{3}\,\mathrm{m}$ zeigt eindeutig 3 GZ.`, def:SIGRULES },
+    { id:'ph-z-g1', deck:'pz', ql:'Zählen', q:'Zufallsaufgabe: gültige Ziffern zählen', term:'erst ab der ersten Ziffer ≠ 0 zählen', def:SIGRULES,
+      gen() {
+        const n = ri(1, 5), digits = [ri(1, 9)];
+        for (let i = 1; i < n; i++) digits.push(i === n - 1 && ri(0, 2) === 0 ? 0 : ri(0, 9));
+        const form = ri(0, 3), D = digits.join('');
+        let s, lead = 0;
+        if (form === 0) { lead = ri(1, 4); s = '0,' + '0'.repeat(lead - 1) + D; }
+        else if (form === 1 && n > 1) s = D[0] + ',' + D.slice(1);
+        else if (form === 2) s = `${D[0]}${n > 1 ? ',' + D.slice(1) : ''} \\cdot 10^{${pick([-19, -12, -9, -6, 3, 5, 8, 18])}}`;
+        else { s = D.slice(0, Math.max(1, Math.ceil(n / 2))) + (n > 1 ? ',' + D.slice(Math.max(1, Math.ceil(n / 2))) : ''); if (s.endsWith(',')) s = s.slice(0, -1); }
+        if (!s.includes(',') && !s.includes('cdot') && s.length > 1 && s.endsWith('0')) s = D[0] + ',' + D.slice(1);
+        const t = `$${s.replace(/,/g, '{,}')}$`;
+        return { q:`Wie viele gültige Ziffern hat ${t}?`, term:String(n), wrong: opts(String(n), [n + 1, n - 1, n + lead, n + 2, n + 3].filter(x => x > 0).map(String)),
+          def: `${t}: ${lead ? 'Die führenden Nullen zählen nicht. ' : ''}${digits[n - 1] === 0 ? 'Die Null am Ende zählt mit. ' : ''}${form === 2 ? 'Die Zehnerpotenz zählt nicht. ' : ''}→ ${n} gültige Ziffer${n > 1 ? 'n' : ''}.` };
+      } },
+    { id:'ph-z-g2', deck:'pz', ql:'Runden', q:'Zufallsaufgabe: auf n gültige Ziffern runden', term:'auf n gültige Ziffern runden', def:'Ab der ersten Ziffer ≠ 0 abzählen, dann normal runden. Nullen, die beim Runden am Ende entstehen, bleiben stehen (z. B. 3,00).',
+      gen() {
+        const e = pick([-7, -5, -4, -3, -2, -1, 0, 1, 2, 4, 6]), v = (ri(10000, 99999) / 10000) * Math.pow(10, e), n = ri(2, 3);
+        const show = sig(v, 5), right = `$${sig(v, n)}$`;
+        const trunc = Math.trunc(v / Math.pow(10, Math.floor(Math.log10(v)) - n + 1)) * Math.pow(10, Math.floor(Math.log10(v)) - n + 1);
+        return { q:`Runde $${show}$ auf ${n} gültige Ziffern.`, term:right,
+          wrong: opts(right, [`$${sig(v, n + 1)}$`, `$${sig(v, n - 1 || 1)}$`, `$${sig(trunc * 1.0000001, n)}$`, `$${sig(v * 10, n)}$`, `$${sig(v / 10, n)}$`]),
+          def:`$${show}$ → ${n} gültige Ziffern → ${right}` };
+      } },
+    { id:'ph-z-g3', deck:'pz', ql:'Ergebnis', q:'Zufallsaufgabe: Wie viele gültige Ziffern hat das Ergebnis?', term:'so viele wie die ungenaueste Angabe', def:'Immer kleinste GZ – Konstanten zählen nicht.',
+      gen() {
+        const s = scen();
+        return { q:`${scenQ(s)}. Mit wie vielen gültigen Ziffern gibst du $${s.g}$ an?`, term:String(s.n), wrong: opts(String(s.n), [s.n + 1, s.n - 1, s.n + 2, 5].filter(x => x > 0).map(String)),
+          def: s.a.map(a => `$${a[0]}$: ${GZ[a[1]]} GZ`).join(' · ') + (s.k ? ' · Konstante zählt nicht' : '') + ` → kleinste: ${s.n}` };
+      } },
+    { id:'ph-z-g4', deck:'pz', ql:'Ergebnis runden', q:'Zufallsaufgabe: Ergebnis richtig gerundet angeben', term:'Ergebnis mit der kleinsten Anzahl gültiger Ziffern', def:'Erst ausrechnen, dann auf die kleinste GZ der Angaben runden.',
+      gen() {
+        const s = scen(), U = s.u ? `\\,${s.u}` : '', R = n => `$${s.g} = ${sig(s.r, n, true)}${U}$`, right = R(s.n);
+        return { q:`${scenQ(s)}. Der Taschenrechner zeigt $${sci(s.r, 7)}$. Wie gibst du $${s.g}$ an?`, term:right,
+          wrong: opts(right, [R(s.n + 1), R(s.n + 2), R(Math.max(1, s.n - 1)), R(7)]),
+          def: s.a.map(a => `$${a[0]}$: ${GZ[a[1]]} GZ`).join(' · ') + ` → ${s.n} GZ → ${right}` };
+      } },
+  ];
+
+  /* ───────────── GRUNDEINHEITEN UMRECHNEN ───────────── */
+  const PRE = { G: 9, M: 6, k: 3, d: -1, c: -2, m: -3, 'µ': -6, n: -9, p: -12 };
+  const VORSATZ = 'G = 10⁹ · M = 10⁶ · k = 10³ · d = 10⁻¹ · c = 10⁻² · m = 10⁻³ · µ = 10⁻⁶ · n = 10⁻⁹ · p = 10⁻¹²';
+  const UTEX = (pre, un) => `\\,\\mathrm{${pre === 'µ' ? '\\mu ' : pre}${un}}`;
+  const CONVCARDS = [
+    { id:'ph-v-g1', deck:'pv', ql:'Vorsatz → Grundeinheit', q:'Zufallsaufgabe: Vorsatz in Grundeinheit umrechnen', term:'Vorsatz durch Zehnerpotenz ersetzen', def:VORSATZ,
+      gen() {
+        const [pre, un] = pick([['p', 'F'], ['n', 'F'], ['µ', 'F'], ['n', 'C'], ['µ', 'C'], ['p', 'C'], ['m', 'A'], ['µ', 'A'], ['k', 'V'], ['m', 'V'], ['M', 'V'], ['m', 'm'], ['µ', 'm'], ['n', 'm'], ['c', 'm'], ['k', 'm'], ['m', 's'], ['µ', 's'], ['M', 'Hz'], ['G', 'Hz'], ['k', 'N'], ['m', 'N'], ['k', 'J']]);
+        const v = pick([1.2, 2.5, 4.7, 4.9, 6.8, 12, 15, 33, 49, 75, 150, 230, 470, 680]), e = PRE[pre], U = `\\,\\mathrm{${un}}`;
+        const right = `$${sci(v * Math.pow(10, e), 3)}${U}$`;
+        return { q:`$${dz(v)}${UTEX(pre, un)}$ in $\\mathrm{${un}}$?`, term:right,
+          wrong: opts(right, [e + 3, e - 3, -e, e + 1, e - 1].map(x => `$${sci(v * Math.pow(10, x), 3)}${U}$`)),
+          def:`$${pre === 'µ' ? '\\mu' : pre} = 10^{${e}}$ → $${dz(v)} \\cdot 10^{${e}}${U} = ${sci(v * Math.pow(10, e), 3)}${U}$` };
+      } },
+    { id:'ph-v-g2', deck:'pv', ql:'Fläche / Volumen', q:'Zufallsaufgabe: Flächen und Volumen in m² / m³', term:'Fläche: Exponent mal 2 · Volumen: Exponent mal 3', def:L('1 cm² = (10⁻² m)² = 10⁻⁴ m²', '1 mm² = 10⁻⁶ m²', '1 dm³ = 1 L = 10⁻³ m³', '1 cm³ = 10⁻⁶ m³', '1 mm³ = 10⁻⁹ m³'),
+      gen() {
+        const [from, to, e, vals, wr] = pick([
+          ['cm^2', 'm^2', -4, [400, 225, 50, 15, 1.2e3], [-2, -6, -8]], ['mm^2', 'm^2', -6, [2, 50, 0.5, 12], [-3, -4, -12]], ['dm^2', 'm^2', -2, [5, 0.8, 12], [-1, -4, -3]],
+          ['cm^3', 'm^3', -6, [2.6, 50, 250, 0.4], [-3, -2, -9]], ['dm^3', 'm^3', -3, [2.6e-6, 5, 0.8, 40], [-1, -6, -9]], ['mm^3', 'm^3', -9, [5, 120, 0.7], [-3, -6, -12]], ['L', 'm^3', -3, [1.5, 0.33, 20], [-1, -6, 3]]]);
+        const v = pick(vals), right = `$${sci(v * Math.pow(10, e), 3)}\\,\\mathrm{${to}}$`;
+        return { q:`$${v >= 0.01 && v < 1e4 ? dz(v) : sci(v, 3)}\\,\\mathrm{${from}}$ in $\\mathrm{${to}}$?`, term:right, wrong: opts(right, wr.map(x => `$${sci(v * Math.pow(10, x), 3)}\\,\\mathrm{${to}}$`)),
+          def:`$1\\,\\mathrm{${from}} = 10^{${e}}\\,\\mathrm{${to}}$` };
+      } },
+    { id:'ph-v-g3', deck:'pv', ql:'Zusammengesetzt', q:'Zufallsaufgabe: zusammengesetzte Einheiten umrechnen', term:'Zähler und Nenner einzeln umrechnen', def:L(T`$1\,\dfrac{\mathrm{g}}{\mathrm{cm^3}} = \dfrac{10^{-3}\,\mathrm{kg}}{10^{-6}\,\mathrm{m^3}} = 10^{3}\,\dfrac{\mathrm{kg}}{\mathrm{m^3}}$`, T`$1\,\dfrac{\mathrm{km}}{\mathrm{h}} = \dfrac{1000\,\mathrm{m}}{3600\,\mathrm{s}} = \dfrac{1}{3{,}6}\,\dfrac{\mathrm{m}}{\mathrm{s}}$`, T`$1\,\dfrac{\mathrm{kV}}{\mathrm{cm}} = \dfrac{10^{3}\,\mathrm{V}}{10^{-2}\,\mathrm{m}} = 10^{5}\,\dfrac{\mathrm{V}}{\mathrm{m}}$`),
+      gen() {
+        const t = ri(0, 2);
+        if (t === 0) { const v = pick([19.3, 2.7, 7.9, 1.0, 0.92, 11.3]), U = T`\,\dfrac{\mathrm{kg}}{\mathrm{m^3}}`, R = x => `$${sci(x, 3)}${U}$`, right = R(v * 1e3);
+          return { q:`$${dz(v)}\\,\\dfrac{\\mathrm{g}}{\\mathrm{cm^3}}$ in $\\dfrac{\\mathrm{kg}}{\\mathrm{m^3}}$?`, term:right, wrong: opts(right, [R(v * 1e-3), R(v * 1e6), R(v * 1e-6), R(v)]), def:T`$\cdot 10^{3}$ (Gramm → kg: $10^{-3}$, cm³ → m³: $10^{-6}$ im Nenner)` }; }
+        if (t === 1) { const v = pick([36, 54, 72, 90, 108, 18]), U = T`\,\dfrac{\mathrm{m}}{\mathrm{s}}`, R = x => `$${dz(+x.toFixed(1))}${U}$`, right = R(v / 3.6);
+          return { q:`$${v}\\,\\dfrac{\\mathrm{km}}{\\mathrm{h}}$ in $\\dfrac{\\mathrm{m}}{\\mathrm{s}}$?`, term:right, wrong: opts(right, [R(v * 3.6), R(v / 60), R(v / 3.6 * 10), R(v / 36)]), def:'durch 3,6 teilen' }; }
+        const v = pick([2.0, 4.5, 12, 0.5, 30]), [du, de] = pick([['cm', -2], ['mm', -3]]), e = 3 - de, U = T`\,\dfrac{\mathrm{V}}{\mathrm{m}}`, R = x => `$${sci(x, 3)}${U}$`, right = R(v * Math.pow(10, e));
+        return { q:`$${dz(v)}\\,\\dfrac{\\mathrm{kV}}{\\mathrm{${du}}}$ in $\\dfrac{\\mathrm{V}}{\\mathrm{m}}$?`, term:right, wrong: opts(right, [R(v * 1e3), R(v * Math.pow(10, 3 + de)), R(v * Math.pow(10, e + 1)), R(v * Math.pow(10, e - 1))]), def:`kV → $10^{3}$, ${du} → $10^{${de}}$ im Nenner → $\\cdot 10^{${e}}$` };
+      } },
+    { id:'ph-v-g4', deck:'pv', ql:'Rückwärts', q:'Zufallsaufgabe: Grundeinheit in Vorsatz-Einheit', term:'durch die Zehnerpotenz des Vorsatzes teilen', def:VORSATZ,
+      gen() {
+        const [pre, un] = pick([['p', 'F'], ['n', 'F'], ['n', 'C'], ['µ', 'C'], ['m', 'A'], ['m', 'm'], ['µ', 'm'], ['k', 'V'], ['m', 's']]);
+        const v = pick([4.7, 15, 33, 150, 220, 470, 2.5, 68]), e = PRE[pre], base = v * Math.pow(10, e), R = x => `$${dz(+x.toPrecision(3))}${UTEX(pre, un)}$`, right = R(v);
+        return { q:`$${sci(base, 3)}\\,\\mathrm{${un}}$ in $\\mathrm{${pre === 'µ' ? '\\mu ' : pre}${un}}$?`, term:right, wrong: opts(right, [R(v * 1000), R(v / 1000), R(v * 10), R(v / 10)]),
+          def:`$${sci(base, 3)}\\,\\mathrm{${un}} : 10^{${e}} = ${dz(v)}${UTEX(pre, un)}$` };
+      } },
+    { id:'ph-v-g5', deck:'pv', ql:'Einsetzen', q:'Zufallsaufgabe: erst umrechnen, dann einsetzen', term:'alle Angaben zuerst in Grundeinheiten', def:'Vor dem Einsetzen jede Angabe in Grundeinheiten mit Zehnerpotenz umschreiben – dann passt auch die Einheit des Ergebnisses.',
+      gen() {
+        const t = ri(0, 2);
+        if (t === 0) { const U = pick([2.0, 1.5, 4.5, 12]), d = pick([4.0, 5.0, 2.5, 8.0]), Us = sig(U, 2), ds = sig(d, 2), r = U * 1e3 / (d * 1e-3), R = x => `$E = ${sig(x, 2, true)}\\,\\dfrac{\\mathrm{V}}{\\mathrm{m}}$`, right = R(r);
+          return { q:`Plattenkondensator: $U = ${Us}\\,\\mathrm{kV}$, $d = ${ds}\\,\\mathrm{mm}$. Berechne $E = \\dfrac{U}{d}$.`, term:right, wrong: opts(right, [R(r / 1e3), R(r * 1e3), R(U / d), R(r / 1e6)]),
+            def:`$E = \\dfrac{${Us} \\cdot 10^{3}\\,\\mathrm{V}}{${ds} \\cdot 10^{-3}\\,\\mathrm{m}} = ${sig(r, 2, true)}\\,\\dfrac{\\mathrm{V}}{\\mathrm{m}}$` }; }
+        if (t === 1) { const C = pick([47, 22, 33, 68]), U = pick([12, 9.0, 24, 6.0]), Us = sig(U, 2), r = C * 1e-9 * U, R = x => `$Q = ${sig(x, 2, true)}\\,\\mathrm{C}$`, right = R(r);
+          return { q:`Kondensator: $C = ${C}\\,\\mathrm{nF}$, $U = ${Us}\\,\\mathrm{V}$. Berechne $Q = C \\cdot U$.`, term:right, wrong: opts(right, [R(r * 1e3), R(r / 1e3), R(C * U), R(r * 1e9)]),
+            def:`$Q = ${C} \\cdot 10^{-9}\\,\\mathrm{F} \\cdot ${Us}\\,\\mathrm{V} = ${sig(r, 2, true)}\\,\\mathrm{C}$` }; }
+        const q = pick([12, 24, 4.0, 65]), E = pick([3.4, 6.2, 1.2, 8.0]), qs = sig(q, 2), Es = sig(E, 2), r = q * 1e-9 * E * 1e4, R = x => `$F = ${sig(x, 2, true)}\\,\\mathrm{N}$`, right = R(r);
+        return { q:`Ladung $q = ${qs}\\,\\mathrm{nC}$ im Feld $E = ${Es} \\cdot 10^{4}\\,\\dfrac{\\mathrm{V}}{\\mathrm{m}}$. Berechne $F = q \\cdot E$.`, term:right, wrong: opts(right, [R(r * 1e3), R(r / 1e3), R(r * 1e9), R(q * E)]),
+          def:`$F = ${qs} \\cdot 10^{-9}\\,\\mathrm{C} \\cdot ${Es} \\cdot 10^{4}\\,\\dfrac{\\mathrm{V}}{\\mathrm{m}} = ${sig(r, 2, true)}\\,\\mathrm{N}$` };
+      } },
+  ];
+
   return [
-    ...SYMCARDS, ...FORMCARDS,
+    ...SYMCARDS, ...UNITCARDS, ...FORMCARDS, ...SIGCARDS, ...CONVCARDS,
     /* ───────────── KONSTANTEN & GRÖSSENORDNUNGEN ───────────── */
     { id:'ph-k01', deck:'pk', q:T`Elementarladung $e$`, term:T`$e = 1{,}602 \cdot 10^{-19}\,\mathrm{C}$`,
       wrong:[T`$e = 1{,}602 \cdot 10^{-31}\,\mathrm{C}$`, T`$e = 9{,}11 \cdot 10^{-19}\,\mathrm{C}$`, T`$e = 1{,}602 \cdot 10^{19}\,\mathrm{C}$`, T`$e = 6{,}24 \cdot 10^{-18}\,\mathrm{C}$`],
