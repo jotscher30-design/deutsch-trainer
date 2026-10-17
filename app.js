@@ -1,11 +1,11 @@
-/* Abi-Trainer – Logik (Deutsch + Physik)
+/* Abi-Trainer – Logik (Deutsch + Physik + W-Seminar)
  * Spaced Repetition (vereinfachtes SM-2), Active Recall, Interleaving, Wenn-Dann-Plan.
  * Themen-Status pro Fach: 0 = aus, 1 = normal, 2 = Fokus (neue Karten kommen dreimal so oft).
  * Alles lokal in localStorage – keine Server, keine Accounts.
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 4;
+  const NEWS = 5;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -13,8 +13,10 @@
   const SUBJ = {
     de: { id: 'de', name: 'Deutsch', decks: DECKS, cards: CARDS, mc: 0.65, npd: 5, goal: 12 },
     ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15 },
+    // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
+    ws: { id: 'ws', name: 'W-Seminar', decks: DECKS_WS, cards: CARDS_WS, mc: 0.6, npd: 25, goal: 40, exam: '2026-10-21', examName: 'Ex Arbeitslosigkeit' },
   };
-  const ALL_DECKS = [...DECKS, ...DECKS_PH];
+  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WS];
 
   /* ───────── Hilfen ───────── */
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
@@ -30,17 +32,19 @@
     }).join('');
   };
   const deckOf = id => ALL_DECKS.find(d => d.id === id);
-  const subjOf = card => card.id.startsWith('ph-') ? 'ph' : 'de';
+  const subjOf = card => card.id.startsWith('ph-') ? 'ph' : card.id.startsWith('ws-') ? 'ws' : 'de';
+  // Nächstes Fach mit offenen Karten (sonst irgendein anderes)
+  const nextSubj = k => Object.keys(SUBJ).filter(x => x !== k).find(x => todo(x)) || Object.keys(SUBJ).find(x => x !== k);
   const K = () => S.set.cur;
   const cur = () => SUBJ[K()];
   const conf = (k = K()) => S.set[k];
 
   /* ───────── State ───────── */
   const subjDefaults = k => ({ newPerDay: SUBJ[k].npd, goal: SUBJ[k].goal, decks: Object.fromEntries(SUBJ[k].decks.map(d => [d.id, d.def])) });
-  const defaults = () => ({ v: 2, news: 0, cards: {}, hist: { de: {}, ph: {} }, set: { ifthen: '', onboarded: false, cur: 'de', de: subjDefaults('de'), ph: subjDefaults('ph') } });
+  const defaults = () => ({ v: 2, news: 0, cards: {}, hist: { de: {}, ph: {}, ws: {} }, set: { ifthen: '', onboarded: false, cur: 'de', de: subjDefaults('de'), ph: subjDefaults('ph'), ws: subjDefaults('ws') } });
   function normalize(s) {
     const d = defaults();
-    s.v = 2; s.cards = s.cards || {}; s.hist = Object.assign({ de: {}, ph: {} }, s.hist || {});
+    s.v = 2; s.cards = s.cards || {}; s.hist = Object.assign({ de: {}, ph: {}, ws: {} }, s.hist || {});
     s.set = Object.assign({}, d.set, s.set || {});
     for (const k of Object.keys(SUBJ)) { s.set[k] = Object.assign({}, d.set[k], s.set[k] || {}); s.set[k].decks = Object.assign({}, d.set[k].decks, s.set[k].decks || {}); }
     if (!SUBJ[s.set.cur]) s.set.cur = 'de';
@@ -85,6 +89,9 @@
     else { c.i = c.i < 1 ? 3 : Math.round(c.i * c.e * 1.3); c.e = Math.min(3, c.e + 0.1); }
     c.i = Math.min(c.i, 180);
     c.due = addDays(t, c.i);
+    // Prüfung in Sicht: spätestens am Vortag wieder dran; was am Vortag schwer war, am Prüfungstag
+    const ex = SUBJ[subjOf({ id })].exam;
+    if (ex && t < ex) { const eve = addDays(ex, -1), cap = t < eve ? eve : rating <= 2 ? ex : null; if (cap && c.due > cap) c.due = cap; }
   }
   const enabled = (k = K()) => SUBJ[k].cards.filter(c => conf(k).decks[c.deck] > 0);
   const dueCards = (k = K()) => enabled(k).filter(c => S.cards[c.id] && S.cards[c.id].due <= today());
@@ -221,7 +228,7 @@
     const presets = ['Wenn ich morgens im Bus sitze', 'Wenn ich das Mathe-Blatt fertig habe', 'Wenn ich abends die Zähne geputzt habe', 'Wenn ich in der Pause aufs Handy schaue'];
     app.innerHTML = `
       <h1>Abi-Trainer</h1>
-      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …). Nach dem Lehrplan der 12.</p>
+      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und W-Seminar (${CARDS_WS.length} Karten: Keynes, Friedman, Arbeitslosigkeit). Nach dem Lehrplan der 12.</p>
       <div class="box">
         <p><b>So funktioniert es</b></p>
         <p class="muted">Jeden Tag ein paar Minuten pro Fach. Die App fragt dich ab (nicht du liest nach) und zeigt dir jede Karte genau dann wieder, wenn du sie fast vergessen hättest. Das ist der Unterschied zwischen „vor der Schulaufgabe neu lernen“ und „sitzt“.</p>
@@ -248,7 +255,7 @@
 
   function heatmap(weeks) {
     const t = today(); const cells = []; const total = weeks * 7;
-    // Spalte = Woche, Zeile = Wochentag (Mo oben); zählt beide Fächer
+    // Spalte = Woche, Zeile = Wochentag (Mo oben); zählt alle Fächer
     const dow = (new Date(t + 'T12:00:00').getDay() + 6) % 7; // Mo=0
     const start = addDays(t, -(total - 1) + (6 - dow)); // so dass heute in der letzten Spalte steht
     for (let i = 0; i < total; i++) {
@@ -266,14 +273,15 @@
     const st = streak(), total = due + fresh, goal = conf().goal;
     const wd = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'][new Date().getDay()];
     const focus = cur().decks.filter(d => conf().decks[d.id] === 2).map(d => d.short);
-    const other = Object.keys(SUBJ).find(x => x !== k);
+    const other = nextSubj(k), ex = cur().exam, dl = ex && t <= ex ? Math.round((new Date(ex) - new Date(t)) / 864e5) : -1;
     app.innerHTML = `
       ${subjSwitch()}
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu in Physik: Themen einzeln abfragen</b></p>
-        <p class="muted small" style="margin:0 0 6px">Unten auf dieser Seite: „Einzeln abfragen" – tippe ein Thema an, dann kommt nur das dran. Formelzeichen fragen jetzt immer Name UND Einheit ab.</p>
-        <p class="muted small" style="margin:0 0 10px">Neue Themen: Einheiten · Gültige Ziffern (mit deinen Heft-Beispielen) · Grundeinheiten umrechnen – dort gibt es Zufallsaufgaben mit immer neuen Zahlen.</p>
+      ${dl >= 0 ? `<div class="box exam"><b>${cur().examName}: ${dl === 0 ? 'heute' : dl === 1 ? 'morgen' : `in ${dl} Tagen`}</b><p class="muted small" style="margin:4px 0 0">${dl <= 1 ? 'Nur noch Abruf: fällige Karten, dann einzelne Themen.' : 'Alle Karten sind spätestens am Vortag nochmal dran.'}</p></div>` : ''}
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: W-Seminar – Ex Arbeitslosigkeit</b></p>
+        <p class="muted small" style="margin:0 0 6px">Fachbegriffe und der Vergleich Keynes / Friedman aus dem Material deiner Seminarleiterin. Bis Dienstag kommt jede Karte nochmal dran.</p>
+        ${k !== 'ws' ? `<button class="btn" data-subj="ws" style="padding:10px">Zum W-Seminar</button>` : ''}
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       <div class="box center">
         ${ring(h.r, goal)}
@@ -315,7 +323,7 @@
     const it = sess.items[sess.pos];
     if (!it) return renderDone();
     prep(it);
-    const card = it.card, deck = deckOf(card.deck), isPh = subjOf(card) === 'ph';
+    const card = it.card, deck = deckOf(card.deck), isPh = subjOf(card) === 'ph', fxLab = subjOf(card) === 'de' ? 'Wirkung / Merke' : 'Merke';
     const prog = Math.round(sess.pos / sess.items.length * 100);
     const head = `<div class="topbar"><button class="x" id="quit">×</button><div class="grow"><div class="progress"><i style="width:${prog}%"></i></div></div><span class="muted small">${sess.pos + 1}/${sess.items.length}</span></div>`;
     const tag = `<span class="pill deck" style="background:${deck.color}">${deck.short}</span>`;
@@ -331,7 +339,7 @@
           ${lab(card.q || card.gen ? 'Erklärung' : 'Definition', card.gen ? it.why : card.def)}
           ${lab('Beispiel', ex, 'ex')}
           ${card.exs ? lab('Weitere Beispiele', card.exs.join('\n'), 'ex') : ''}
-          ${lab(isPh ? 'Merke' : 'Wirkung / Merke', card.fx)}</div></div>
+          ${lab(fxLab, card.fx)}</div></div>
         <button class="btn primary" id="ok">Gemerkt – gleich abfragen</button>`;
       $('#ok').onclick = () => {
         S.cards[card.id] = { e: 2.5, i: 0, due: today(), n: 0, l: 0 }; H(today(), sess.k).n++; save();
@@ -352,7 +360,7 @@
         let rest;
         if (card.gen) rest = [['Lösungsweg', it.why], ['Merke', card.fx]];
         else if (card.q) rest = [['Erklärung', card.def], ['Merke', card.fx]];
-        else rest = [isEx ? ['Definition', card.def] : ['Beispiel', card.ex], [isPh ? 'Merke' : 'Wirkung / Merke', card.fx]];
+        else rest = [isEx ? ['Definition', card.def] : ['Beispiel', card.ex], [fxLab, card.fx]];
         rest = rest.filter(r => r[1]);
         $('#after').innerHTML = `<div class="box" style="margin-top:14px"><p style="margin:0 0 6px"><b>${ok ? 'Richtig.' : card.q || card.gen ? 'Nein.' : 'Nein – ' + esc(card.term) + '.'}</b></p>
           ${rest.map(([l, v]) => `<div class="lab sm">${l}</div><div class="def">${rich(v)}</div>`).join('')}</div>
@@ -371,8 +379,8 @@
           ${card.q ? lab('Antwort', card.term, 'ans') : ''}
           ${lab(card.q ? 'Erklärung' : 'Definition', card.def)}
           ${lab('Beispiel', card.ex, 'ex')}
-          ${lab(isPh ? 'Merke' : 'Wirkung / Merke', card.fx)}</div></div>
-        <div id="ctl"><button class="btn primary" id="reveal">Aufdecken</button><p class="muted small center" style="margin-top:10px">Erst im Kopf antworten${isPh ? ' (oder auf Papier)' : ''}. Dann aufdecken.</p></div>`;
+          ${lab(fxLab, card.fx)}</div></div>
+        <div id="ctl"><button class="btn primary" id="reveal">Aufdecken</button><p class="muted small center" style="margin-top:10px">Erst im Kopf antworten${fxLab === 'Merke' ? ' (oder auf Papier)' : ''}. Dann aufdecken.</p></div>`;
       $('#reveal').onclick = () => {
         $('#ans').style.display = '';
         $('#ctl').innerHTML = `<p class="muted small center" style="margin-bottom:8px">Wie gut wusstest du es?</p><div class="rate">
@@ -397,7 +405,7 @@
   function renderDone() {
     const pct = sess.done ? Math.round(sess.correct / sess.done * 100) : 0;
     const f = FACTS[Math.floor(Math.random() * FACTS.length)];
-    const k = sess.k, h = H(today(), k), other = Object.keys(SUBJ).find(x => x !== k);
+    const k = sess.k, h = H(today(), k), other = nextSubj(k);
     const msg = pct >= 90 ? 'Sauber.' : pct >= 70 ? 'Solide. Die Wackler kommen morgen wieder.' : pct >= 50 ? 'Okay – die Hälfte sitzt noch nicht. Morgen nochmal.' : 'Schwerer Tag. Genau dafür ist die App da: Die Karten kommen wieder, bis sie sitzen.';
     app.innerHTML = `
       <div class="box center"><div class="emoji">${pct >= 70 ? '✅' : '🔁'}</div>
@@ -422,7 +430,7 @@
   function renderLex() {
     const k = K(), cs = cur().cards;
     app.innerHTML = `${subjSwitch(false)}<h1 style="margin-top:14px">Lexikon</h1><p class="muted">Alle ${cs.length} ${cur().name}-Karten zum Nachschlagen – auch vor der Klausur.</p>
-      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
+      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'ws' ? 'Suchen … (z. B. Fiskalpolitik, Agenda, Mismatch)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
     const list = $('#list');
     const hay = c => [c.term, c.q, c.def, c.ex, (c.exs || []).join(' '), c.fx].join(' ').toLowerCase();
     const draw = () => {
@@ -439,7 +447,7 @@
             const short = c.q && !c.gen && c.term.length < 110 && !c.term.includes('\n');
             const title = c.q ? `<span>${rich(c.q)}${short ? `<span class="sub">${rich(c.term)}</span>` : ''}</span>` : `<span>${rich(c.term)}</span>`;
             return `<div class="cardrow${q ? ' open' : ''}" data-id="${c.id}"><div class="t">${title}<span class="dot ${cls}"></span></div>
-            <div class="body">${c.gen ? `<div class="muted small">Zufallsaufgabe – jedes Mal neue Zahlen.</div>` : ''}${c.q && !c.gen && !short ? `<div class="ans">${rich(c.term)}</div>` : ''}${c.def && !c.q ? `<div>${rich(c.def)}</div>` : c.def ? `<div class="muted">${rich(c.def)}</div>` : ''}${c.ex ? `<div class="muted" style="margin-top:4px"><i>${rich(c.ex)}</i></div>` : ''}${c.exs && c.exs.length ? `<div class="muted small" style="margin-top:4px">Weitere Beispiele: ${c.exs.map(rich).join(' · ')}</div>` : ''}${c.fx ? `<div class="muted" style="margin-top:4px">${rich(c.fx)}</div>` : ''}${s ? `<div class="small muted" style="margin-top:6px">Nächste Abfrage: ${s.due.split('-').reverse().join('.')} · Intervall ${s.i} Tage</div>` : ''}</div></div>`;
+            <div class="body">${c.gen ? `<div class="muted small">${c.gn || 'Zufallsaufgabe – jedes Mal neue Zahlen.'}</div>` : ''}${c.q && !c.gen && !short ? `<div class="ans">${rich(c.term)}</div>` : ''}${c.def && !c.q ? `<div>${rich(c.def)}</div>` : c.def ? `<div class="muted">${rich(c.def)}</div>` : ''}${c.ex ? `<div class="muted" style="margin-top:4px"><i>${rich(c.ex)}</i></div>` : ''}${c.exs && c.exs.length ? `<div class="muted small" style="margin-top:4px">Weitere Beispiele: ${c.exs.map(rich).join(' · ')}</div>` : ''}${c.fx ? `<div class="muted" style="margin-top:4px">${rich(c.fx)}</div>` : ''}${s ? `<div class="small muted" style="margin-top:6px">Nächste Abfrage: ${s.due.split('-').reverse().join('.')} · Intervall ${s.i} Tage</div>` : ''}</div></div>`;
           }).join('')}</div>` : ''}</div>`;
       }).join('') || '<p class="muted center">Nichts gefunden.</p>';
     };
@@ -466,7 +474,7 @@
       <div class="stats3"><div class="stat"><b>${streak()}</b><span>aktuelle Serie</span></div><div class="stat"><b>${best}</b><span>längste Serie</span></div><div class="stat"><b>${days.length}</b><span>Lerntage</span></div></div>
       <div class="stats3" style="margin-top:10px"><div class="stat"><b>${totalR}</b><span>Antworten ${cur().name}</span></div><div class="stat"><b>${r7 ? Math.round(c7 / r7 * 100) : 0} %</b><span>richtig · 7 Tage</span></div><div class="stat"><b>${mastered()}</b><span>sitzen</span></div></div>
       <h2>Letzte 26 Wochen</h2>${heatmap(26)}
-      <p class="muted small">Ein Feld = ein Tag, beide Fächer zusammen. Dunkler = mehr Karten. Lücken sind kein Drama – die Karten warten.</p>
+      <p class="muted small">Ein Feld = ein Tag, alle Fächer zusammen. Dunkler = mehr Karten. Lücken sind kein Drama – die Karten warten.</p>
       <h2>${cur().name} nach Thema</h2>
       ${cur().decks.map(d => { const all = cur().cards.filter(c => c.deck === d.id); const seen = all.filter(c => S.cards[c.id]).length; const ms = all.filter(c => S.cards[c.id] && S.cards[c.id].i >= 21).length; const st = conf().decks[d.id];
         return `<div class="box" style="padding:12px 16px${st ? '' : ';opacity:.55'}"><div class="row between"><b>${d.name}</b><span class="muted small">${ms}/${all.length} sitzen${st ? '' : ' · aus'}</span></div>
@@ -488,11 +496,11 @@
         <div id="decks">${cur().decks.map(d => `<div class="toggle col"><span>${d.name} <span class="muted small">(${cur().cards.filter(x => x.deck === d.id).length})</span></span>
           <div class="seg tri" data-d="${d.id}">${['Aus', 'Normal', 'Fokus'].map((l, i) => `<button class="${c.decks[d.id] === i ? 'on' : ''}" data-v="${i}">${l}</button>`).join('')}</div></div>`).join('')}</div></div>
       <div class="box"><b>Wenn-Dann-Plan</b><p style="margin:8px 0"><input type="text" id="ifthen" placeholder="Wenn ich …" value="${esc(S.set.ifthen)}"></p><p class="muted small">… dann mache ich meine Abfrage. Tipp: Dazu eine tägliche Erinnerung in der Erinnerungen-App zur gleichen Uhrzeit.</p></div>
-      <div class="box"><b>Daten</b><p class="muted small">Alles liegt nur auf diesem Gerät. Export = Sicherung als Textdatei (beide Fächer).</p>
+      <div class="box"><b>Daten</b><p class="muted small">Alles liegt nur auf diesem Gerät. Export = Sicherung als Textdatei (alle Fächer).</p>
         <button class="btn" id="exp">Fortschritt exportieren</button>
         <button class="btn" id="impBtn">Fortschritt importieren</button><input type="file" id="imp" accept="application/json" style="display:none">
         <button class="btn ghost" id="reset" style="color:var(--bad)">Fortschritt zurücksetzen</button></div>
-      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
+      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + W-Seminar ${CARDS_WS.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
     $('#npd').onclick = e => { const b = e.target.closest('button'); if (b) { c.newPerDay = +b.dataset.v; save(); render(); } };
     $('#goal').onclick = e => { const b = e.target.closest('button'); if (b) { c.goal = +b.dataset.v; save(); render(); } };
     $('#decks').onclick = e => {
@@ -506,7 +514,7 @@
     $('#exp').onclick = () => { const blob = new Blob([JSON.stringify(S)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `abi-trainer-${today()}.json`; a.click(); };
     $('#impBtn').onclick = () => $('#imp').click();
     $('#imp').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(txt => { try { const s = JSON.parse(txt); if (!s.cards || !s.hist) throw 0; S = s.v === 2 ? normalize(s) : migrate(s); S.set.onboarded = true; S.news = NEWS; save(); alert('Import fertig.'); render(); } catch { alert('Datei nicht lesbar.'); } }); };
-    $('#reset').onclick = () => { if (confirm('Wirklich alles zurücksetzen – beide Fächer? Serie und Karten-Fortschritt gehen verloren.')) { const s = defaults(); s.set.ifthen = S.set.ifthen; s.set.onboarded = true; s.news = NEWS; S = s; save(); render(); } };
+    $('#reset').onclick = () => { if (confirm('Wirklich alles zurücksetzen – alle Fächer? Serie und Karten-Fortschritt gehen verloren.')) { const s = defaults(); s.set.ifthen = S.set.ifthen; s.set.onboarded = true; s.news = NEWS; S = s; save(); render(); } };
   }
 
   /* ───────── Start ───────── */

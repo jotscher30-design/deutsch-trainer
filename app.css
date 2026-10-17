@@ -131,8 +131,10 @@ input[type=search], input[type=text], select { width: 100%; font: inherit; paddi
 
 /* ───── Seit 08.10.2026: Fächer, Formeln, Skizzen ───── */
 body[data-subj="ph"] { --accent: #1971c2; }
+body[data-subj="ws"] { --accent: #5f3dc4; }
+.box.exam { border-color: var(--accent); }
 .seg.subj { padding: 4px; }
-.seg.subj button { padding: 10px 8px; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.seg.subj button { padding: 10px 4px; font-size: 15px; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .badge { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; line-height: 18px; }
 .pill.focus { background: color-mix(in srgb, var(--accent) 18%, var(--card)); color: var(--accent); }
 .news { border-color: var(--accent); }
