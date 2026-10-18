@@ -7,6 +7,9 @@
  * Felder wie in data.js / data-physik.js. IDs mit Präfix `ws-`, nie ändern.
  */
 const DECKS_WS = [
+  // Check-up: manuell (nicht in der Tagesabfrage), feste Reihenfolge, ohne Lern-Vorschau – erst aufs Blatt, dann aufdecken
+  { id: 'wc', name: 'Check-up: aus dem Kopf aufs Blatt', short: 'Check-up', color: '#212529', q: 'Aufs Blatt', def: 1, manual: true, seq: true },
+  { id: 'wx', name: '⚠ Lücken vom Blatt (18.10.)', short: '⚠ Lücken', color: '#e03131', q: 'Frage', def: 2, nl: 15 },
   { id: 'wk', name: 'Keynes · Nachfragepolitik (NWP)',   short: 'Keynes',     color: '#1971c2', q: 'Welcher Begriff?', def: 2 },
   { id: 'wf', name: 'Friedman · Angebotspolitik (AWP)',  short: 'Friedman',   color: '#e67700', q: 'Welcher Begriff?', def: 2 },
   { id: 'wv', name: 'Vergleich & Wirkungsketten',        short: 'Vergleich',  color: '#5f3dc4', q: 'Frage', def: 2 },
@@ -84,7 +87,82 @@ const CARDS_WS = (() => {
     [2, 'Zeitarbeit'],
   ];
 
-  return [
+  const M = '(Gelb = fehlte auf deinem Blatt vom 18.10.)';
+  const cards = [
+    /* ───────────── CHECK-UP: AUS DEM KOPF AUFS BLATT ─────────────
+     * !!…!! = gelb markiert: fehlte auf Jonas' Blatt vom 18.10.2026 */
+    { id: 'ws-c01', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Vergleichstabelle Keynes | Friedman – alles aufs Blatt.', 'Zeilen:', '1. Diagnose (Ursachen)', '2. Ansatzpunkte', '3. Maßnahmen', '4. Kritik', '5. Hauptziel + Zeithorizont + Rolle des Staates'),
+      term: '', tbl: [
+        ['', 'Keynes · NWP', 'Friedman · AWP'],
+        ['Diagnose', L('Markt allein schafft keine Vollbeschäftigung', 'Zu wenig gesamtwirtschaftliche Nachfrage'), L('Markt findet selbst ins Gleichgewicht (!!Saysches Theorem!!)', 'Krisen entstehen durch Staatseingriffe', '!!Zu hohe Kosten: Löhne, Steuern, Abgaben!!')],
+        ['Ansatzpunkte', L('!!Gesamtwirtschaftliche Nachfrage!!:', '$C_H$, $I_{br}$, $C_{St}$, $X$'), L('!!Angebotsseite!!:', '!!Rentabilität der Unternehmen, Arbeitskräfteangebot, Geldmarkt, Produktionsapparat!!')],
+        ['Maßnahmen', L('Antizyklische Fiskalpolitik', 'Staatsinvestitionen per deficit spending', 'Steuern senken (direkt + indirekt)', '!!Transfers erhöhen!!', '!!Subventionen, Sonderabschreibungen!!', '!!Exportförderung!!', '!!Im Aufschwung: Haushaltskonsolidierung!!'),
+          L('Unternehmenssteuern senken, Abschreibungen, Innovationsförderung', 'Sozialabgaben und -leistungen senken', 'Deregulierung, Staatsquote senken', '!!Geldmenge wächst wie das Produktionspotenzial (Monetarismus)!!', '!!Produktivitätsorientierte Lohnpolitik!!', '!!Gründungen fördern, neutraler Haushalt!!')],
+        ['Kritik', L('Staatsverschuldung steigt', 'Time-lags (!!inside / outside!!)', 'Strukturprobleme bleiben', '!!Zeitpunkt unklar!!', '!!Umfang unklar!!'),
+          L('Löhne sind auch Nachfrage', '!!Rationalisierung vernichtet Jobs!!', '!!Investition nur bei Absatzerwartung!!', '!!Sparen in der Krise erhöht die AL!!')],
+        ['Ziel · Zeit · Staat', L('!!Kurzfristiges gesamtwirtschaftliches Gleichgewicht!!', 'kurzfristig', 'Staat greift aktiv ein'), L('!!Mittelfristiges Gleichgewicht + internationale Wettbewerbsposition!!', 'langfristig', 'Staat setzt nur den Rahmen')],
+      ], fx: 'Jede Zelle mit deinem Blatt vergleichen, Fehlendes in Rot nachtragen. ' + M },
+    { id: 'ws-c02', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Wirkungskette Keynes – aufs Blatt.', 'Vom Instrument über die Initialzündung bis zum Hauptziel (8 Kästchen).'),
+      term: L('Instrument: antizyklische Finanz- und Steuerpolitik', '↓ Initialzündung: höhere Staatsinvestitionen', '↓ mehr Beschäftigung in den betroffenen Branchen (!!Bau, Zulieferer!!)', '↓ höheres !!Volkseinkommen!! in diesen Branchen', '↓ mehr Konsumnachfrage', '↓ mehr Beschäftigung in der Konsumgüterindustrie', '↓ mehr private Investitionen', '→ !!Hauptziel: kurzfristiges gesamtwirtschaftliches Gleichgewicht!!'),
+      fx: 'Grundüberlegung oben drüber: Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung. ' + M },
+    { id: 'ws-c03', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Wirkungskette Friedman – aufs Blatt.', 'Erst die drei Instrumente, dann Initialzündung bis Hauptziel.'),
+      term: L('Instrumente:', '· !!potenzialorientierte Geldpolitik!!', '· !!angebotsorientierte Finanzpolitik!!', '· !!produktivitätsorientierte!! Lohnpolitik', '↓ Initialzündung: Steuererleichterungen (Abschreibungen, Innovationsförderung)', '↓ Ertragskraft der Unternehmen steigt', '↓ mehr private Investitionen, auch innovative', '↓ mehr Beschäftigung in der !!Investitionsgüterindustrie, Modernisierung des Produktionsapparats!!', '→ !!Hauptziel: mittelfristiges Gleichgewicht + bessere internationale Wettbewerbsposition durch niedrigere Produktionskosten!!'),
+      fx: 'NICHT in der Kette: „Löhne steigen“. Grundüberlegung: Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung. ' + M },
+    { id: 'ws-c04', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Agenda 2010 – aufs Blatt.', '1. Wer, wann, warum?', '2. Einordnung (nachfrage- oder angebotsorientiert, gegen welche AL?)', '3. Insider-Outsider-Problem in 2 Sätzen erklären', '4. Aufgabe 4: die drei Spalten'),
+      term: L('1. !!Gerhard Schröder (SPD), 14. März 2003!!, gegen über 4 Mio. Arbeitslose', '2. Überwiegend angebotsorientiert, gegen strukturelle AL', '3. !!Beschäftigte sind durch Kündigungsschutz und Tarife geschützt. Arbeitgeber stellen deshalb ungern ein – Arbeitslose bleiben dauerhaft draußen.!!',
+        '4. !!Finanziell: Subventionen · Weiterbildung/Umschulung · Existenzgründer · Unternehmenssteuern senken!!', '!!Flexibilisierung: Lohnnebenkosten senken · Löhne differenzieren · Kündigungsschutz lockern · Bürokratieabbau!!', '!!Sonstige: strengere Regeln für Arbeitslose · Lohnzurückhaltung · Zeitarbeit!!',
+        'Weitere aus M3: !!Flächentarifverträge über Öffnungsklauseln!! flexibilisiert, Hartz I–IV, Minijobs, Ich-AGs'),
+      fx: 'Nicht „flächendeckende Tarife“, sondern Flächentarifvertrag. ' + M },
+    { id: 'ws-c05', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Arten der Arbeitslosigkeit – aufs Blatt.', 'Alle 4 Arten, nach Dauer geordnet, je Ursache + welche Politik hilft.'),
+      term: L('kurzfristig: friktionell – Suchzeit zwischen zwei Jobs → kaum vermeidbar', 'vorübergehend: saisonal – Jahreszeit, Witterung → kaum vermeidbar', 'vorübergehend: !!konjunkturell – Rezession, Nachfrage sinkt!! → !!Keynes / Nachfragepolitik!!', 'dauerhaft-verfestigt: strukturell – Mismatch, Technik, Region, Kosten → !!Angebotspolitik, Qualifizierung, Agenda 2010!!'),
+      fx: M },
+    { id: 'ws-c06', deck: 'wc', noMC: true, nolearn: true,
+      q: L('Die Kernsätze – je ein Satz aufs Blatt:', '1. Grundüberlegung Keynes', '2. Grundüberlegung Friedman', '3. Initialzündung Keynes | Friedman', '4. Hauptziel Keynes | Friedman', '5. Was ist Monetarismus?', '6. Potenzialorientierte Geldpolitik', '7. Produktivitätsorientierte Lohnpolitik', '8. Fiskalpolitik (Definition)'),
+      term: L('1. Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung.', '2. Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung.', '3. Keynes: höhere Staatsinvestitionen | Friedman: Steuererleichterungen', '4. !!Keynes: kurzfristiges Gleichgewicht | Friedman: mittelfristiges Gleichgewicht + Wettbewerbsposition!!',
+        '5. !!Die Geldmenge ist entscheidend für Beschäftigung, Einkommen und Preise – sie soll nach fester Regel stetig wachsen.!!', '6. !!Die Zentralbank lässt die Geldmenge so stark wachsen wie das Produktionspotenzial; kein kurzfristiges Gegensteuern.!!',
+        '7. !!Löhne steigen höchstens so stark wie die Produktivität – Lohnkosten pro Stück bleiben gleich.!!', '8. Das Bestreben des Staates, durch Veränderungen der Staatseinnahmen und -ausgaben stabilisierend auf den Wirtschaftsablauf einzuwirken.'),
+      fx: M },
+
+    /* ───────────── ⚠ LÜCKEN VOM BLATT (18.10.) ───────────── */
+    { id: 'ws-x01', deck: 'wx', q: 'Was besagt Friedmans Monetarismus?', term: 'Die Geldmenge ist entscheidend und soll stetig mit dem Produktionspotenzial wachsen',
+      wrong: ['Der Staat soll in der Krise die Geldmenge stark erhöhen', 'Die Geldmenge spielt für die Beschäftigung keine Rolle', 'Die Regierung legt jedes Jahr neu fest, wie viel Geld gedruckt wird'],
+      def: 'Zu viel Geld → Preise steigen (Inflation). Zu wenig → Wirtschaft wird gebremst. Darum: feste Regel statt Feuerwehr.' },
+    { id: 'ws-x02', deck: 'wx', q: 'Wer steuert bei der potenzialorientierten Geldpolitik die Geldmenge?', term: 'Die Zentralbank – nach fester Regel, nicht kurzfristig',
+      wrong: ['Die Regierung über den Staatshaushalt', 'Die Gewerkschaften über die Löhne', 'Die Unternehmen über ihre Investitionen'],
+      def: 'Sie bringt Geld über Kredite an Banken und den Leitzins in Umlauf.' },
+    { id: 'ws-x03', deck: 'wx', q: 'Das Produktionspotenzial wächst um 2 %. Wie stark soll die Geldmenge nach Friedman wachsen?', term: 'Etwa 2 % – so stark wie das Potenzial',
+      wrong: ['Gar nicht – die Geldmenge bleibt fix', 'Stark, z. B. 10 %, um die Nachfrage anzukurbeln', 'Je nach Lage: in der Krise mehr, im Boom weniger'],
+      def: '2 % mehr Brötchen brauchen etwa 2 % mehr Geld. Mehr Geld als Brötchen → nur höhere Preise.' },
+    { id: 'ws-x04', deck: 'wx', q: 'Die Produktivität steigt um 3 %. Was verlangt die produktivitätsorientierte Lohnpolitik?', term: 'Löhne steigen höchstens um 3 % – die Lohnkosten pro Stück bleiben gleich',
+      wrong: ['Löhne steigen um mehr als 3 %, damit die Nachfrage wächst', 'Löhne werden um 3 % gesenkt', 'Löhne bleiben unabhängig von der Produktivität gleich'],
+      def: 'Steigen Löhne stärker, wird jedes Stück teurer → weniger rentabel → weniger Einstellungen. Keynes dagegen: Löhne = Kaufkraft.' },
+    { id: 'ws-x05', deck: 'wx', q: 'Angebotsorientierte Finanzpolitik (Friedman) vs. Fiskalpolitik (Keynes) – der Unterschied?', term: 'Gleiche Werkzeuge (Steuern, Ausgaben) – Friedman dauerhaft für bessere Unternehmensbedingungen, Keynes antizyklisch zur Nachfragesteuerung',
+      wrong: ['Friedman nutzt nur die Geldmenge, keine Steuern', 'Keynes senkt dauerhaft die Staatsquote', 'Es gibt keinen Unterschied'] },
+    { id: 'ws-x06', deck: 'wx', q: 'Tabellenzeile „Ansatzpunkte“ bei Keynes?', term: 'Die gesamtwirtschaftliche Nachfrage: $C_H$, $I_{br}$, $C_{St}$, $X$',
+      wrong: ['Antizyklische Fiskalpolitik', 'Die Rentabilität der Unternehmen', 'Die Geldmenge'],
+      def: 'Antizyklische Fiskalpolitik ist das Instrument (Zeile Maßnahmen), nicht der Ansatzpunkt – das stand falsch auf deinem Blatt.' },
+    { id: 'ws-x07', deck: 'wx', q: 'Welcher Punkt ist KEINE Kritik an Friedman?', term: 'Time-lags verzögern die Wirkung',
+      wrong: ['Investitionsförderung finanziert auch Rationalisierung', 'Unternehmen investieren nur bei Absatzerwartung', 'Sparen in der Krise erhöht die Arbeitslosigkeit'],
+      def: 'Time-lags = Kritik an Keynes. Kritik an Friedman: Löhne sind auch Nachfrage · Rationalisierung · Absatzerwartung · Sparen in der Krise.' },
+    { id: 'ws-x08', deck: 'wx', q: 'Steht in Friedmans Wirkungskette „die Löhne steigen“?', term: 'Nein – Ertragskraft steigt → mehr Investitionen → mehr Beschäftigung in der Investitionsgüterindustrie',
+      wrong: ['Ja, direkt nach der Initialzündung', 'Ja, am Ende als Hauptziel'] },
+    { id: 'ws-x09', deck: 'wx', q: 'Kritik „Verzögerung bis zum Beschluss / bis zur Wirkung“ – wie heißt das richtig?', term: 'Time-lag (inside-lag / outside-lag)',
+      wrong: ['Time-Gap', 'Konjunkturlücke', 'Deficit spending'] },
+    { id: 'ws-x10', deck: 'wx', q: 'Tarifvertrag für eine ganze Branche und Region – Name, und wie lockerte die Agenda ihn?', term: 'Flächentarifvertrag – über Öffnungsklauseln',
+      wrong: ['Flächendeckender Tarif – über den Mindestlohn', 'Haustarifvertrag – über Zeitarbeit', 'Branchenvertrag – über Hartz IV'] },
+    { id: 'ws-x11', deck: 'wx', q: 'Welche Art der AL fehlte auf deinem Blatt – und welche Politik hilft dagegen?', term: 'Konjunkturelle AL → Nachfragepolitik (Keynes)',
+      wrong: ['Strukturelle AL → Konjunkturprogramm (Keynes)', 'Friktionelle AL → Agenda 2010', 'Saisonale AL → Monetarismus'] },
+    { id: 'ws-x12', deck: 'wx', q: 'Welche Politik passt zu struktureller Arbeitslosigkeit?', term: 'Angebotspolitik: Qualifizierung, Flexibilisierung (Agenda 2010)',
+      wrong: ['Konjunkturprogramm mit Staatsinvestitionen', 'Gar keine – sie verschwindet von selbst', 'Geldmenge stark erhöhen'] },
+    { id: 'ws-x13', deck: 'wx', q: 'Insider-Outsider-Problem – erkläre es in zwei Sätzen.', noMC: true,
+      term: L('Beschäftigte (Insider) sind durch Kündigungsschutz und Tarife geschützt.', 'Arbeitgeber stellen deshalb ungern ein – Arbeitslose (Outsider) bleiben dauerhaft draußen.'),
+      fx: 'Agenda-Antwort: Kündigungsschutz lockern, Zeitarbeit, Öffnungsklauseln.' },
+
     /* ───────────── KEYNES · NACHFRAGEPOLITIK ───────────── */
     { id: 'ws-k01', deck: 'wk', term: 'Nachfrageorientierte Wirtschaftspolitik (NWP)',
       def: 'Der Staat kurbelt die Käufe von Haushalten, Unternehmen, Staat und Ausland an, weil der Markt allein keine Vollbeschäftigung schafft.',
@@ -272,4 +350,9 @@ const CARDS_WS = (() => {
       term: L('Pro: Lohnzuschuss senkt das Risiko für Arbeitgeber und überbrückt Anlaufschwierigkeiten (M4).', 'Pro: Arbeit bedeutet Würde und Teilhabe; Coaching hilft individuell – Beispiel Rubelt (M5).', 'Kontra: teuer – Milliarden aus Steuergeld (M6).', 'Kontra: manche kommen trotz Hilfe nie an; staatlich bezahlte Jobs verdrängen private Firmen (M6).'),
       fx: 'Eigenes Urteil mit Begründung bringt die Punkte. M5 ist ein Glücksfall, kein Beweis.' },
   ];
+  // Karten zu den Lücken vom 18.10. (⚠ markiert, kommen nach der Umstellung sofort dran)
+  const MISS = ['ws-f03', 'ws-f10', 'ws-f11', 'ws-f17', 'ws-k11', 'ws-k20', 'ws-v05', 'ws-v06', 'ws-v07', 'ws-v09', 'ws-g14', 'ws-g15', 'ws-a03', 'ws-a06'];
+  for (const c of cards) if (c.deck === 'wx' || MISS.includes(c.id)) c.miss = true;
+  for (const c of cards) if (c.deck === 'wc') c.ql = 'Aus dem Kopf aufs Blatt';
+  return cards;
 })();

@@ -5,7 +5,7 @@
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 5;
+  const NEWS = 6;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -29,8 +29,11 @@
     return String(s).split('$').map((p, i) => {
       if (i % 2 && window.katex) { try { return katex.renderToString(p, { throwOnError: false, strict: 'ignore' }); } catch (e) { return esc(p); } }
       return esc(p).replace(/\n/g, '<br>');
-    }).join('');
+    }).join('').replace(/!!(.+?)!!/g, '<mark class="miss">$1</mark>'); // !!…!! = Lücke, gelb markiert
   };
+  // Vergleichstabelle (erste Zeile = Kopf, erste Spalte = Zeilenname) – handytauglich: Zeilenname als eigene Zeile über den Spalten
+  const tblHtml = t => `<div class="tblwrap"><table class="cmp"><tr>${t[0].slice(1).map(c => `<th>${rich(c)}</th>`).join('')}</tr>${t.slice(1).map(r =>
+    `<tr><th class="rowh" colspan="${r.length - 1}">${rich(r[0])}</th></tr><tr>${r.slice(1).map(c => `<td>${rich(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
   const deckOf = id => ALL_DECKS.find(d => d.id === id);
   const subjOf = card => card.id.startsWith('ph-') ? 'ph' : card.id.startsWith('ws-') ? 'ws' : 'de';
   // Nächstes Fach mit offenen Karten (sonst irgendein anderes)
@@ -70,6 +73,8 @@
   if ((S.mig || 0) < 3) { for (const d of DECKS_PH) S.set.ph.decks[d.id] = d.def; S.mig = 3; }
   // 13.10.2026: neue Physik-Themen Einheiten, Gültige Ziffern, Umrechnen einschalten
   if (S.mig < 4) { for (const id of ['ps', 'pu', 'pf', 'pz', 'pv']) S.set.ph.decks[id] = 2; S.mig = 4; }
+  // 18.10.2026: Lücken vom W-Seminar-Blatt – schon gesehene ⚠-Karten sofort wieder fällig
+  if (S.mig < 5) { for (const c of CARDS_WS) if (c.miss && S.cards[c.id]) S.cards[c.id].due = today(); S.set.ws.decks.wx = 2; S.mig = 5; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
@@ -93,7 +98,7 @@
     const ex = SUBJ[subjOf({ id })].exam;
     if (ex && t < ex) { const eve = addDays(ex, -1), cap = t < eve ? eve : rating <= 2 ? ex : null; if (cap && c.due > cap) c.due = cap; }
   }
-  const enabled = (k = K()) => SUBJ[k].cards.filter(c => conf(k).decks[c.deck] > 0);
+  const enabled = (k = K()) => SUBJ[k].cards.filter(c => conf(k).decks[c.deck] > 0 && !deckOf(c.deck).manual); // manuelle Themen (Check-up) nur auf Knopfdruck
   const dueCards = (k = K()) => enabled(k).filter(c => S.cards[c.id] && S.cards[c.id].due <= today());
   const newCards = (k = K()) => enabled(k).filter(c => !S.cards[c.id]);
   const newAllowed = (k = K()) => Math.max(0, conf(k).newPerDay - H(today(), k).n);
@@ -157,7 +162,10 @@
   let sess = null;
   function buildSession({ extra = false, deck = null } = {}) {
     const k = K(), items = [];
-    if (deck) { // nur ein Thema abfragen
+    if (deck && deckOf(deck).seq) { // Check-up: alle Aufgaben in fester Reihenfolge, erst aufs Blatt, dann aufdecken
+      const t = today();
+      SUBJ[k].cards.filter(c => c.deck === deck).forEach(card => items.push({ card, mode: 'flash', extra: !!(S.cards[card.id] && S.cards[card.id].due > t) }));
+    } else if (deck) { // nur ein Thema abfragen
       const all = SUBJ[k].cards.filter(c => c.deck === deck), t = today();
       const due = all.filter(c => S.cards[c.id] && S.cards[c.id].due <= t);
       shuffle(due).slice(0, 20).forEach(card => items.push({ card, mode: modeFor(card, k) }));
@@ -166,7 +174,7 @@
       const gens = all.filter(c => c.gen && S.cards[c.id]);
       for (let i = 0; gens.length && items.length < 12 && i < 30; i++) items.push({ card: gens[i % gens.length], mode: 'mc', extra: true });
       shuffle(items);
-      const fresh = all.filter(c => !S.cards[c.id]).slice(0, 6);
+      const fresh = all.filter(c => !S.cards[c.id]).slice(0, deckOf(deck).nl || 6); // nl: mehr neue Karten pro Runde erlauben
       fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, { card, mode: 'learn' }));
     } else if (extra) {
       const seen = enabled(k).filter(c => S.cards[c.id]);
@@ -279,10 +287,11 @@
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
       ${dl >= 0 ? `<div class="box exam"><b>${cur().examName}: ${dl === 0 ? 'heute' : dl === 1 ? 'morgen' : `in ${dl} Tagen`}</b><p class="muted small" style="margin:4px 0 0">${dl <= 1 ? 'Nur noch Abruf: fällige Karten, dann einzelne Themen.' : 'Alle Karten sind spätestens am Vortag nochmal dran.'}</p></div>` : ''}
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: W-Seminar – Ex Arbeitslosigkeit</b></p>
-        <p class="muted small" style="margin:0 0 6px">Fachbegriffe und der Vergleich Keynes / Friedman aus dem Material deiner Seminarleiterin. Bis Dienstag kommt jede Karte nochmal dran.</p>
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu im W-Seminar: Check-up + ⚠ Lücken</b></p>
+        <p class="muted small" style="margin:0 0 6px">Check-up = Vergleichstabelle, beide Wirkungsketten, Agenda 2010, Arten der AL und Kernsätze aus dem Kopf aufs Blatt, dann aufdecken. Gelb markiert ist, was auf deinem Blatt gefehlt hat. Die ⚠-Karten sind ab sofort fällig.</p>
         ${k !== 'ws' ? `<button class="btn" data-subj="ws" style="padding:10px">Zum W-Seminar</button>` : ''}
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
+      ${SUBJ[k].decks.some(d => d.seq) ? SUBJ[k].decks.filter(d => d.seq).map(d => `<div class="box checkup"><b>${d.name}</b><p class="muted small" style="margin:4px 0 10px">${SUBJ[k].cards.filter(c => c.deck === d.id).length} Aufgaben fürs Blatt: erst schreiben, dann aufdecken und vergleichen. Gelb = hat beim letzten Mal gefehlt.</p><button class="btn primary" data-checkup="${d.id}">Check-up starten</button></div>`).join('') : ''}
       <div class="box center">
         ${ring(h.r, goal)}
         <p class="muted">${h.r >= goal ? 'Tagesziel erreicht. Stark.' : h.r > 0 ? `Noch ${goal - h.r} bis zum Tagesziel.` : 'Noch nichts gemacht heute.'}</p>
@@ -309,6 +318,7 @@
     const n = $('#newsok'); if (n) n.onclick = () => { S.news = NEWS; save(); render(); };
     const c = $('#chg'); if (c) c.onclick = e => { e.preventDefault(); go('settings'); };
     app.querySelectorAll('.chip[data-deck]').forEach(b => b.onclick = () => startSession({ deck: b.dataset.deck }));
+    app.querySelectorAll('[data-checkup]').forEach(b => b.onclick = () => startSession({ deck: b.dataset.checkup }));
   }
 
   function startSession(opts) {
@@ -326,7 +336,7 @@
     const card = it.card, deck = deckOf(card.deck), isPh = subjOf(card) === 'ph', fxLab = subjOf(card) === 'de' ? 'Wirkung / Merke' : 'Merke';
     const prog = Math.round(sess.pos / sess.items.length * 100);
     const head = `<div class="topbar"><button class="x" id="quit">×</button><div class="grow"><div class="progress"><i style="width:${prog}%"></i></div></div><span class="muted small">${sess.pos + 1}/${sess.items.length}</span></div>`;
-    const tag = `<span class="pill deck" style="background:${deck.color}">${deck.short}</span>`;
+    const tag = `<span class="pill deck" style="background:${deck.color}">${deck.short}</span>${card.miss ? ' <span class="pill miss">⚠ fehlte</span>' : ''}`;
     const qLabel = card.ql || deck.q;
 
     if (it.mode === 'learn') {
@@ -377,10 +387,11 @@
           ${prompt}
           <div class="answer" id="ans" style="display:none">
           ${card.q ? lab('Antwort', card.term, 'ans') : ''}
+          ${card.tbl ? tblHtml(card.tbl) : ''}
           ${lab(card.q ? 'Erklärung' : 'Definition', card.def)}
           ${lab('Beispiel', card.ex, 'ex')}
           ${lab(fxLab, card.fx)}</div></div>
-        <div id="ctl"><button class="btn primary" id="reveal">Aufdecken</button><p class="muted small center" style="margin-top:10px">Erst im Kopf antworten${fxLab === 'Merke' ? ' (oder auf Papier)' : ''}. Dann aufdecken.</p></div>`;
+        <div id="ctl"><button class="btn primary" id="reveal">Aufdecken</button><p class="muted small center" style="margin-top:10px">${card.nolearn ? 'Erst komplett aufs Blatt schreiben. Dann aufdecken, vergleichen, Fehlendes in Rot nachtragen.' : `Erst im Kopf antworten${fxLab === 'Merke' ? ' (oder auf Papier)' : ''}. Dann aufdecken.`}</p></div>`;
       $('#reveal').onclick = () => {
         $('#ans').style.display = '';
         $('#ctl').innerHTML = `<p class="muted small center" style="margin-bottom:8px">Wie gut wusstest du es?</p><div class="rate">
@@ -445,9 +456,9 @@
           ${open ? `${q ? '' : `<button class="btn ghost practice" data-practice="${d.id}">Nur dieses Thema üben</button>`}<div style="margin-top:8px">${cards.map(c => {
             const s = S.cards[c.id]; const cls = !s ? '' : s.i >= 21 ? 's2' : 's1';
             const short = c.q && !c.gen && c.term.length < 110 && !c.term.includes('\n');
-            const title = c.q ? `<span>${rich(c.q)}${short ? `<span class="sub">${rich(c.term)}</span>` : ''}</span>` : `<span>${rich(c.term)}</span>`;
+            const title = c.q ? `<span>${c.miss ? '<span class="pill miss">⚠</span> ' : ''}${rich(c.q)}${short ? `<span class="sub">${rich(c.term)}</span>` : ''}</span>` : `<span>${rich(c.term)}</span>`;
             return `<div class="cardrow${q ? ' open' : ''}" data-id="${c.id}"><div class="t">${title}<span class="dot ${cls}"></span></div>
-            <div class="body">${c.gen ? `<div class="muted small">${c.gn || 'Zufallsaufgabe – jedes Mal neue Zahlen.'}</div>` : ''}${c.q && !c.gen && !short ? `<div class="ans">${rich(c.term)}</div>` : ''}${c.def && !c.q ? `<div>${rich(c.def)}</div>` : c.def ? `<div class="muted">${rich(c.def)}</div>` : ''}${c.ex ? `<div class="muted" style="margin-top:4px"><i>${rich(c.ex)}</i></div>` : ''}${c.exs && c.exs.length ? `<div class="muted small" style="margin-top:4px">Weitere Beispiele: ${c.exs.map(rich).join(' · ')}</div>` : ''}${c.fx ? `<div class="muted" style="margin-top:4px">${rich(c.fx)}</div>` : ''}${s ? `<div class="small muted" style="margin-top:6px">Nächste Abfrage: ${s.due.split('-').reverse().join('.')} · Intervall ${s.i} Tage</div>` : ''}</div></div>`;
+            <div class="body">${c.gen ? `<div class="muted small">${c.gn || 'Zufallsaufgabe – jedes Mal neue Zahlen.'}</div>` : ''}${c.q && !c.gen && !short ? `<div class="ans">${rich(c.term)}</div>` : ''}${c.tbl ? tblHtml(c.tbl) : ''}${c.def && !c.q ? `<div>${rich(c.def)}</div>` : c.def ? `<div class="muted">${rich(c.def)}</div>` : ''}${c.ex ? `<div class="muted" style="margin-top:4px"><i>${rich(c.ex)}</i></div>` : ''}${c.exs && c.exs.length ? `<div class="muted small" style="margin-top:4px">Weitere Beispiele: ${c.exs.map(rich).join(' · ')}</div>` : ''}${c.fx ? `<div class="muted" style="margin-top:4px">${rich(c.fx)}</div>` : ''}${s ? `<div class="small muted" style="margin-top:6px">Nächste Abfrage: ${s.due.split('-').reverse().join('.')} · Intervall ${s.i} Tage</div>` : ''}</div></div>`;
           }).join('')}</div>` : ''}</div>`;
       }).join('') || '<p class="muted center">Nichts gefunden.</p>';
     };

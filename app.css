@@ -155,3 +155,13 @@ body[data-subj="ws"] { --accent: #5f3dc4; }
 .chip b { font-size: 15px; }
 .chip span { font-size: 12px; color: var(--muted); }
 .chip:active { transform: scale(.98); }
+
+/* W-Seminar: Lücken markieren, Vergleichstabelle, Check-up */
+mark.miss { background: #ffe066; color: #1f1a17; padding: 0 3px; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.pill.miss { background: #e03131; color: #fff; }
+.tblwrap { overflow-x: auto; margin: 8px 0; }
+table.cmp { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13.5px; line-height: 1.4; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; }
+table.cmp th, table.cmp td { border: 1px solid var(--line); padding: 5px 5px; vertical-align: top; text-align: left; }
+table.cmp tr:first-child th { background: var(--soft); width: 50%; }
+table.cmp th.rowh { background: none; border-bottom: 0; padding-top: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.box.checkup { border-left: 4px solid #212529; }
