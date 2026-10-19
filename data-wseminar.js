@@ -9,7 +9,7 @@
 const DECKS_WS = [
   // Check-up: manuell (nicht in der Tagesabfrage), feste Reihenfolge, ohne Lern-Vorschau – erst aufs Blatt, dann aufdecken
   { id: 'wc', name: 'Check-up: aus dem Kopf aufs Blatt', short: 'Check-up', color: '#212529', q: 'Aufs Blatt', def: 1, manual: true, seq: true },
-  { id: 'wx', name: '⚠ Lücken vom Blatt (18.10.)', short: '⚠ Lücken', color: '#e03131', q: 'Frage', def: 2, nl: 15 },
+  { id: 'wx', name: '⚠ Lücken vom Blatt (18.10.)', short: '⚠ Lücken', color: '#e03131', q: 'Frage', def: 2, nl: 20 },
   { id: 'wk', name: 'Keynes · Nachfragepolitik (NWP)',   short: 'Keynes',     color: '#1971c2', q: 'Welcher Begriff?', def: 2 },
   { id: 'wf', name: 'Friedman · Angebotspolitik (AWP)',  short: 'Friedman',   color: '#e67700', q: 'Welcher Begriff?', def: 2 },
   { id: 'wv', name: 'Vergleich & Wirkungsketten',        short: 'Vergleich',  color: '#5f3dc4', q: 'Frage', def: 2 },
@@ -104,12 +104,12 @@ const CARDS_WS = (() => {
         ['Ziel · Zeit · Staat', L('!!Kurzfristiges gesamtwirtschaftliches Gleichgewicht!!', 'kurzfristig', 'Staat greift aktiv ein'), L('!!Mittelfristiges Gleichgewicht + internationale Wettbewerbsposition!!', 'langfristig', 'Staat setzt nur den Rahmen')],
       ], fx: 'Jede Zelle mit deinem Blatt vergleichen, Fehlendes in Rot nachtragen. ' + M },
     { id: 'ws-c02', deck: 'wc', noMC: true, nolearn: true,
-      q: L('Wirkungskette Keynes – aufs Blatt.', 'Vom Instrument über die Initialzündung bis zum Hauptziel (8 Kästchen).'),
-      term: L('Instrument: antizyklische Finanz- und Steuerpolitik', '↓ Initialzündung: höhere Staatsinvestitionen', '↓ mehr Beschäftigung in den betroffenen Branchen (!!Bau, Zulieferer!!)', '↓ höheres !!Volkseinkommen!! in diesen Branchen', '↓ mehr Konsumnachfrage', '↓ mehr Beschäftigung in der Konsumgüterindustrie', '↓ mehr private Investitionen', '→ !!Hauptziel: kurzfristiges gesamtwirtschaftliches Gleichgewicht!!'),
+      q: L('Wirkungskette Keynes – aufs Blatt.', 'Oben die Grundüberlegung, dann vom Instrument über die Initialzündung bis zum Hauptziel.'),
+      term: L('!!Grundüberlegung: Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung.!!', 'Instrument: antizyklische Finanz- und Steuerpolitik', '↓ !!Initialzündung!!: höhere Staatsinvestitionen', '↓ !!erst!! mehr Beschäftigung in den betroffenen Branchen (Bau, !!Zulieferer!!)', '↓ !!dann!! höheres Volkseinkommen in diesen Branchen', '↓ mehr Konsumnachfrage', '↓ mehr Beschäftigung in der Konsumgüterindustrie', '↓ mehr private Investitionen', '→ !!Hauptziel: kurzfristiges gesamtwirtschaftliches Gleichgewicht!!'),
       fx: 'Grundüberlegung oben drüber: Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung. ' + M },
     { id: 'ws-c03', deck: 'wc', noMC: true, nolearn: true,
-      q: L('Wirkungskette Friedman – aufs Blatt.', 'Erst die drei Instrumente, dann Initialzündung bis Hauptziel.'),
-      term: L('Instrumente:', '· !!potenzialorientierte Geldpolitik!!', '· !!angebotsorientierte Finanzpolitik!!', '· !!produktivitätsorientierte!! Lohnpolitik', '↓ Initialzündung: Steuererleichterungen (Abschreibungen, Innovationsförderung)', '↓ Ertragskraft der Unternehmen steigt', '↓ mehr private Investitionen, auch innovative', '↓ mehr Beschäftigung in der !!Investitionsgüterindustrie, Modernisierung des Produktionsapparats!!', '→ !!Hauptziel: mittelfristiges Gleichgewicht + bessere internationale Wettbewerbsposition durch niedrigere Produktionskosten!!'),
+      q: L('Wirkungskette Friedman – aufs Blatt.', 'Oben die Grundüberlegung, dann die drei Instrumente, dann Initialzündung bis Hauptziel.'),
+      term: L('!!Grundüberlegung: Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung.!!', 'Instrumente:', '· potenzialorientierte Geldpolitik', '· angebotsorientierte Finanzpolitik', '· produktivitätsorientierte Lohnpolitik', '↓ !!Initialzündung!!: Steuererleichterungen (Abschreibungen, Innovationsförderung)', '↓ Ertragskraft der Unternehmen steigt', '↓ mehr private Investitionen, auch innovative', '↓ mehr Beschäftigung in der !!Investitionsgüterindustrie, Modernisierung des Produktionsapparats!!', '→ !!Hauptziel: mittelfristiges Gleichgewicht + bessere internationale Wettbewerbsposition durch niedrigere Produktionskosten!!'),
       fx: 'NICHT in der Kette: „Löhne steigen“. Grundüberlegung: Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung. ' + M },
     { id: 'ws-c04', deck: 'wc', noMC: true, nolearn: true,
       q: L('Agenda 2010 – aufs Blatt.', '1. Wer, wann, warum?', '2. Einordnung (nachfrage- oder angebotsorientiert, gegen welche AL?)', '3. Insider-Outsider-Problem in 2 Sätzen erklären', '4. Aufgabe 4: die drei Spalten'),
@@ -162,6 +162,22 @@ const CARDS_WS = (() => {
     { id: 'ws-x13', deck: 'wx', q: 'Insider-Outsider-Problem – erkläre es in zwei Sätzen.', noMC: true,
       term: L('Beschäftigte (Insider) sind durch Kündigungsschutz und Tarife geschützt.', 'Arbeitgeber stellen deshalb ungern ein – Arbeitslose (Outsider) bleiben dauerhaft draußen.'),
       fx: 'Agenda-Antwort: Kündigungsschutz lockern, Zeitarbeit, Öffnungsklauseln.' },
+    { id: 'ws-x14', deck: 'wx', q: 'Grundüberlegung Keynes – der Satz oben über der Kette?', noMC: true,
+      term: 'Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung.',
+      def: L('Kaufen Haushalte, Unternehmen, Staat und Ausland zu wenig, produzieren die Firmen weniger und entlassen.', '→ Darum muss der Staat die Nachfrage ankurbeln.'),
+      fx: 'Merkwort: NACHFRAGE. Gegenstück Friedman: Rentabilität der Produktion.' },
+    { id: 'ws-x15', deck: 'wx', q: 'Grundüberlegung Friedman – der Satz oben über der Kette?', noMC: true,
+      term: 'Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung.',
+      def: L('Lohnt sich die Produktion für die Unternehmen, investieren sie und stellen ein.', '→ Darum muss der Staat die Kosten der Unternehmen senken und sich sonst heraushalten.'),
+      fx: 'Merkwort: RENTABILITÄT. Gegenstück Keynes: Gesamtnachfrage.' },
+    { id: 'ws-x16', deck: 'wx', q: 'Keynes vs. Friedman auf einen Blick: Grundüberlegung · läuft über · mehr Beschäftigung wo · Ziel?', noMC: true, term: '',
+      tbl: [
+        ['', 'Keynes', 'Friedman'],
+        ['Grundüberlegung', 'Die Gesamtnachfrage bestimmt Volkseinkommen und Beschäftigung', 'Die Rentabilität der Produktion bestimmt Einkommen und Beschäftigung'],
+        ['Läuft über', 'Konsum (Nachfrage)', 'Investitionen (Angebot)'],
+        ['Mehr Beschäftigung in der', 'Konsumgüterindustrie', 'Investitionsgüterindustrie'],
+        ['Ziel', 'kurzfristiges gesamtwirtschaftliches Gleichgewicht', 'mittelfristiges gesamtwirtschaftliches Gleichgewicht + Wettbewerbsposition'],
+      ], fx: 'Erst aus dem Kopf aufs Blatt, dann aufdecken.' },
 
     /* ───────────── KEYNES · NACHFRAGEPOLITIK ───────────── */
     { id: 'ws-k01', deck: 'wk', term: 'Nachfrageorientierte Wirtschaftspolitik (NWP)',
@@ -351,7 +367,7 @@ const CARDS_WS = (() => {
       fx: 'Eigenes Urteil mit Begründung bringt die Punkte. M5 ist ein Glücksfall, kein Beweis.' },
   ];
   // Karten zu den Lücken vom 18.10. (⚠ markiert, kommen nach der Umstellung sofort dran)
-  const MISS = ['ws-f03', 'ws-f10', 'ws-f11', 'ws-f17', 'ws-k11', 'ws-k20', 'ws-v05', 'ws-v06', 'ws-v07', 'ws-v09', 'ws-g14', 'ws-g15', 'ws-a03', 'ws-a06'];
+  const MISS = ['ws-f03', 'ws-f10', 'ws-f11', 'ws-f17', 'ws-k11', 'ws-k20', 'ws-v02', 'ws-v03', 'ws-v05', 'ws-v06', 'ws-v07', 'ws-v09', 'ws-g14', 'ws-g15', 'ws-a03', 'ws-a06'];
   for (const c of cards) if (c.deck === 'wx' || MISS.includes(c.id)) c.miss = true;
   for (const c of cards) if (c.deck === 'wc') c.ql = 'Aus dem Kopf aufs Blatt';
   return cards;

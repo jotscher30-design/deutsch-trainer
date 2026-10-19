@@ -75,6 +75,8 @@
   if (S.mig < 4) { for (const id of ['ps', 'pu', 'pf', 'pz', 'pv']) S.set.ph.decks[id] = 2; S.mig = 4; }
   // 18.10.2026: Lücken vom W-Seminar-Blatt – schon gesehene ⚠-Karten sofort wieder fällig
   if (S.mig < 5) { for (const c of CARDS_WS) if (c.miss && S.cards[c.id]) S.cards[c.id].due = today(); S.set.ws.decks.wx = 2; S.mig = 5; }
+  // 19.10.2026: Grundüberlegung Keynes/Friedman nochmal nach vorn
+  if (S.mig < 6) { for (const id of ['ws-v02', 'ws-v03']) if (S.cards[id]) S.cards[id].due = today(); S.mig = 6; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });

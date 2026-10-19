@@ -10,7 +10,7 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
   Werkzeuge (Einheiten, Zehnerpotenzen, Formeln umstellen, Mechanik-Basics), elektrisches Feld, Kondensator,
   Teilchen im Feld & Relativistik, Magnetfeld & Lorentzkraft; Induktion/Schwingkreis (12.2) und Wellen (12.3)
   sind vorbereitet, aber standardmäßig aus. Zufallsaufgaben erzeugen bei jeder Abfrage neue Zahlen.
-- **W-Seminar** (104 Karten, seit 17.10.2026; Check-up + ⚠ Lücken seit 18.10.) – Wirtschaft, Ex „Arbeitslosigkeit“ am 21.10.2026: Keynes/Nachfragepolitik,
+- **W-Seminar** (107 Karten, seit 17.10.2026; Check-up + ⚠ Lücken seit 18.10.) – Wirtschaft, Ex „Arbeitslosigkeit“ am 21.10.2026: Keynes/Nachfragepolitik,
   Friedman/Angebotspolitik, Vergleich & Wirkungsketten, Agenda 2010, Arten der Arbeitslosigkeit, sozialer Arbeitsmarkt.
   Grundlage: Material der Seminarleiterin. Zufallsaufgaben „Keynes oder Friedman?“, „Welche Art von AL?“, „Welche Spalte?“.
   Deck „Check-up“ (`manual`, `seq`): Aufgaben fürs Blatt in fester Reihenfolge, nur per Knopf, Lösung mit `tbl` (Vergleichstabelle);
