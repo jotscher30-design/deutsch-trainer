@@ -1,11 +1,11 @@
-/* Abi-Trainer – Logik (Deutsch + Physik + W-Seminar)
+/* Abi-Trainer – Logik (Deutsch + Physik + Wirtschaft)
  * Spaced Repetition (vereinfachtes SM-2), Active Recall, Interleaving, Wenn-Dann-Plan.
  * Themen-Status pro Fach: 0 = aus, 1 = normal, 2 = Fokus (neue Karten kommen dreimal so oft).
  * Alles lokal in localStorage – keine Server, keine Accounts.
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 6;
+  const NEWS = 7;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -14,9 +14,9 @@
     de: { id: 'de', name: 'Deutsch', decks: DECKS, cards: CARDS, mc: 0.65, npd: 5, goal: 12 },
     ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15 },
     // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
-    ws: { id: 'ws', name: 'W-Seminar', decks: DECKS_WS, cards: CARDS_WS, mc: 0.6, npd: 25, goal: 40, exam: '2026-10-21', examName: 'Ex Arbeitslosigkeit' },
+    wr: { id: 'wr', name: 'Wirtschaft', decks: DECKS_WR, cards: CARDS_WR, mc: 0.6, npd: 15, goal: 30, exam: '2026-10-28', examName: 'Ex Kosten & Break-even' },
   };
-  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WS];
+  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WR];
 
   /* ───────── Hilfen ───────── */
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
@@ -35,7 +35,7 @@
   const tblHtml = t => `<div class="tblwrap"><table class="cmp"><tr>${t[0].slice(1).map(c => `<th>${rich(c)}</th>`).join('')}</tr>${t.slice(1).map(r =>
     `<tr><th class="rowh" colspan="${r.length - 1}">${rich(r[0])}</th></tr><tr>${r.slice(1).map(c => `<td>${rich(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
   const deckOf = id => ALL_DECKS.find(d => d.id === id);
-  const subjOf = card => card.id.startsWith('ph-') ? 'ph' : card.id.startsWith('ws-') ? 'ws' : 'de';
+  const subjOf = card => Object.keys(SUBJ).find(k => card.id.startsWith(k + '-')) || 'de'; // Deutsch-IDs ohne Präfix
   // Nächstes Fach mit offenen Karten (sonst irgendein anderes)
   const nextSubj = k => Object.keys(SUBJ).filter(x => x !== k).find(x => todo(x)) || Object.keys(SUBJ).find(x => x !== k);
   const K = () => S.set.cur;
@@ -44,10 +44,11 @@
 
   /* ───────── State ───────── */
   const subjDefaults = k => ({ newPerDay: SUBJ[k].npd, goal: SUBJ[k].goal, decks: Object.fromEntries(SUBJ[k].decks.map(d => [d.id, d.def])) });
-  const defaults = () => ({ v: 2, news: 0, cards: {}, hist: { de: {}, ph: {}, ws: {} }, set: { ifthen: '', onboarded: false, cur: 'de', de: subjDefaults('de'), ph: subjDefaults('ph'), ws: subjDefaults('ws') } });
+  const perSubj = fn => Object.fromEntries(Object.keys(SUBJ).map(k => [k, fn(k)]));
+  const defaults = () => ({ v: 2, news: 0, cards: {}, hist: perSubj(() => ({})), set: { ifthen: '', onboarded: false, cur: 'de', ...perSubj(subjDefaults) } });
   function normalize(s) {
     const d = defaults();
-    s.v = 2; s.cards = s.cards || {}; s.hist = Object.assign({ de: {}, ph: {}, ws: {} }, s.hist || {});
+    s.v = 2; s.cards = s.cards || {}; s.hist = Object.assign(d.hist, s.hist || {}); // Verlauf entfernter Fächer (W-Seminar) bleibt für die Serie
     s.set = Object.assign({}, d.set, s.set || {});
     for (const k of Object.keys(SUBJ)) { s.set[k] = Object.assign({}, d.set[k], s.set[k] || {}); s.set[k].decks = Object.assign({}, d.set[k].decks, s.set[k].decks || {}); }
     if (!SUBJ[s.set.cur]) s.set.cur = 'de';
@@ -73,14 +74,14 @@
   if ((S.mig || 0) < 3) { for (const d of DECKS_PH) S.set.ph.decks[d.id] = d.def; S.mig = 3; }
   // 13.10.2026: neue Physik-Themen Einheiten, Gültige Ziffern, Umrechnen einschalten
   if (S.mig < 4) { for (const id of ['ps', 'pu', 'pf', 'pz', 'pv']) S.set.ph.decks[id] = 2; S.mig = 4; }
-  // 18.10.2026: Lücken vom W-Seminar-Blatt – schon gesehene ⚠-Karten sofort wieder fällig
-  if (S.mig < 5) { for (const c of CARDS_WS) if (c.miss && S.cards[c.id]) S.cards[c.id].due = today(); S.set.ws.decks.wx = 2; S.mig = 5; }
-  // 19.10.2026: Grundüberlegung Keynes/Friedman nochmal nach vorn
-  if (S.mig < 6) { for (const id of ['ws-v02', 'ws-v03']) if (S.cards[id]) S.cards[id].due = today(); S.mig = 6; }
+  // 18./19.10.2026: Umstellungen im W-Seminar (Fach seit 23.10. entfernt)
+  if (S.mig < 6) S.mig = 6;
+  // 23.10.2026: Wirtschaft ersetzt das W-Seminar – einmal direkt dort starten (Ex 28.10.)
+  if (S.mig < 7) { S.set.cur = 'wr'; S.mig = 7; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
-  const dayTotal = d => Object.keys(SUBJ).reduce((a, k) => a + ((S.hist[k][d] || {}).r || 0), 0);
+  const dayTotal = d => Object.keys(S.hist).reduce((a, k) => a + ((S.hist[k][d] || {}).r || 0), 0);
 
   /* ───────── Scheduling (SM-2 light) ─────────
    * rating: 1 = nicht gewusst, 2 = schwer, 3 = gut, 4 = leicht
@@ -238,7 +239,7 @@
     const presets = ['Wenn ich morgens im Bus sitze', 'Wenn ich das Mathe-Blatt fertig habe', 'Wenn ich abends die Zähne geputzt habe', 'Wenn ich in der Pause aufs Handy schaue'];
     app.innerHTML = `
       <h1>Abi-Trainer</h1>
-      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und W-Seminar (${CARDS_WS.length} Karten: Keynes, Friedman, Arbeitslosigkeit). Nach dem Lehrplan der 12.</p>
+      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und Wirtschaft (${CARDS_WR.length} Karten: Kosten, Erlös, Gewinn, Break-even). Nach dem Lehrplan der 12.</p>
       <div class="box">
         <p><b>So funktioniert es</b></p>
         <p class="muted">Jeden Tag ein paar Minuten pro Fach. Die App fragt dich ab (nicht du liest nach) und zeigt dir jede Karte genau dann wieder, wenn du sie fast vergessen hättest. Das ist der Unterschied zwischen „vor der Schulaufgabe neu lernen“ und „sitzt“.</p>
@@ -289,9 +290,9 @@
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
       ${dl >= 0 ? `<div class="box exam"><b>${cur().examName}: ${dl === 0 ? 'heute' : dl === 1 ? 'morgen' : `in ${dl} Tagen`}</b><p class="muted small" style="margin:4px 0 0">${dl <= 1 ? 'Nur noch Abruf: fällige Karten, dann einzelne Themen.' : 'Alle Karten sind spätestens am Vortag nochmal dran.'}</p></div>` : ''}
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu im W-Seminar: Check-up + ⚠ Lücken</b></p>
-        <p class="muted small" style="margin:0 0 6px">Check-up = Vergleichstabelle, beide Wirkungsketten, Agenda 2010, Arten der AL und Kernsätze aus dem Kopf aufs Blatt, dann aufdecken. Gelb markiert ist, was auf deinem Blatt gefehlt hat. Die ⚠-Karten sind ab sofort fällig.</p>
-        ${k !== 'ws' ? `<button class="btn" data-subj="ws" style="padding:10px">Zum W-Seminar</button>` : ''}
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: Wirtschaft – Ex am 28.10.</b></p>
+        <p class="muted small" style="margin:0 0 6px">Skript S. 6–10: Kostenbegriffe, Formeln, Verschiebungen im Diagramm, Fix oder variabel, Rechnen mit Zufallszahlen. Check-up = aus dem Kopf aufs Blatt. ⚠ = Fehler aus deiner Mitschrift. Das W-Seminar ist raus (Ex geschrieben), dein Verlauf bleibt.</p>
+        ${k !== 'wr' ? `<button class="btn" data-subj="wr" style="padding:10px">Zu Wirtschaft</button>` : ''}
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       ${SUBJ[k].decks.some(d => d.seq) ? SUBJ[k].decks.filter(d => d.seq).map(d => `<div class="box checkup"><b>${d.name}</b><p class="muted small" style="margin:4px 0 10px">${SUBJ[k].cards.filter(c => c.deck === d.id).length} Aufgaben fürs Blatt: erst schreiben, dann aufdecken und vergleichen. Gelb = hat beim letzten Mal gefehlt.</p><button class="btn primary" data-checkup="${d.id}">Check-up starten</button></div>`).join('') : ''}
       <div class="box center">
@@ -443,7 +444,7 @@
   function renderLex() {
     const k = K(), cs = cur().cards;
     app.innerHTML = `${subjSwitch(false)}<h1 style="margin-top:14px">Lexikon</h1><p class="muted">Alle ${cs.length} ${cur().name}-Karten zum Nachschlagen – auch vor der Klausur.</p>
-      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'ws' ? 'Suchen … (z. B. Fiskalpolitik, Agenda, Mismatch)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
+      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'wr' ? 'Suchen … (z. B. Fixkosten, Break-even, Stückkosten)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
     const list = $('#list');
     const hay = c => [c.term, c.q, c.def, c.ex, (c.exs || []).join(' '), c.fx].join(' ').toLowerCase();
     const draw = () => {
@@ -476,7 +477,7 @@
   /* Verlauf */
   function renderStats() {
     const k = K();
-    const days = [...new Set(Object.keys(SUBJ).flatMap(x => Object.keys(S.hist[x])))].filter(d => dayTotal(d) > 0).sort();
+    const days = [...new Set(Object.keys(S.hist).flatMap(x => Object.keys(S.hist[x])))].filter(d => dayTotal(d) > 0).sort();
     const sub = d => S.hist[k][d] || { r: 0, c: 0 };
     const last7 = [...Array(7)].map((_, i) => sub(addDays(today(), -i)));
     const r7 = last7.reduce((a, h) => a + h.r, 0), c7 = last7.reduce((a, h) => a + h.c, 0);
@@ -513,7 +514,7 @@
         <button class="btn" id="exp">Fortschritt exportieren</button>
         <button class="btn" id="impBtn">Fortschritt importieren</button><input type="file" id="imp" accept="application/json" style="display:none">
         <button class="btn ghost" id="reset" style="color:var(--bad)">Fortschritt zurücksetzen</button></div>
-      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + W-Seminar ${CARDS_WS.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
+      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + Wirtschaft ${CARDS_WR.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
     $('#npd').onclick = e => { const b = e.target.closest('button'); if (b) { c.newPerDay = +b.dataset.v; save(); render(); } };
     $('#goal').onclick = e => { const b = e.target.closest('button'); if (b) { c.goal = +b.dataset.v; save(); render(); } };
     $('#decks').onclick = e => {

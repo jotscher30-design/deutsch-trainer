@@ -10,12 +10,13 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
   Werkzeuge (Einheiten, Zehnerpotenzen, Formeln umstellen, Mechanik-Basics), elektrisches Feld, Kondensator,
   Teilchen im Feld & Relativistik, Magnetfeld & Lorentzkraft; Induktion/Schwingkreis (12.2) und Wellen (12.3)
   sind vorbereitet, aber standardmäßig aus. Zufallsaufgaben erzeugen bei jeder Abfrage neue Zahlen.
-- **W-Seminar** (107 Karten, seit 17.10.2026; Check-up + ⚠ Lücken seit 18.10.) – Wirtschaft, Ex „Arbeitslosigkeit“ am 21.10.2026: Keynes/Nachfragepolitik,
-  Friedman/Angebotspolitik, Vergleich & Wirkungsketten, Agenda 2010, Arten der Arbeitslosigkeit, sozialer Arbeitsmarkt.
-  Grundlage: Material der Seminarleiterin. Zufallsaufgaben „Keynes oder Friedman?“, „Welche Art von AL?“, „Welche Spalte?“.
-  Deck „Check-up“ (`manual`, `seq`): Aufgaben fürs Blatt in fester Reihenfolge, nur per Knopf, Lösung mit `tbl` (Vergleichstabelle);
+- **Wirtschaft** (52 Karten, seit 23.10.2026) – WR 12/1 BWL, Ex „Kosten, Erlös, Gewinn, Break-even“ am 28.10.2026:
+  Kostenbegriffe, Formeln, Verschiebungen im Kosten-Erlös-Diagramm, Fix oder variabel, Rechnen (Zufallsaufgaben
+  Break-even, Gewinnmaximum, Stückkosten, neuer Break-even nach Änderung). Grundlage: Skript S. 6–10 + Mitschrift.
+  Deck „Check-up“ (`manual`, `seq`): Aufgaben fürs Blatt in fester Reihenfolge, nur per Knopf, Lösung ggf. mit `tbl`;
   `!!…!!` in Texten = gelb markierte Lücke, `miss: true` = Karte mit ⚠-Hinweis, Deck-Feld `nl` = neue Karten pro Einzelrunde.
-  `exam` in `SUBJ.ws`: bis zum Vortag kommt jede Karte nochmal, was am Vortag schwer war, am Prüfungstag.
+  `exam` in `SUBJ.wr`: bis zum Vortag kommt jede Karte nochmal, was am Vortag schwer war, am Prüfungstag.
+  (Das W-Seminar-Fach „Arbeitslosigkeit“ lief vom 17.–21.10.2026 und ist seit 23.10. entfernt – `data-wseminar.js` steht in der Git-Historie.)
 
 ## Lernprinzipien
 - **Active Recall / Testing-Effekt:** Jede Karte wird abgefragt (Multiple Choice oder Aufdecken + Selbsteinschätzung), nicht gelesen.
@@ -25,13 +26,13 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
 
 ## Dateien
 - `index.html`, `app.css`, `app.js` – App (Vanilla JS, kein Build)
-- `data.js` – Deutsch (`DECKS`, `CARDS`); `data-physik.js` – Physik (`DECKS_PH`, `CARDS_PH`); `data-wseminar.js` – W-Seminar (`DECKS_WS`, `CARDS_WS`)
+- `data.js` – Deutsch (`DECKS`, `CARDS`); `data-physik.js` – Physik (`DECKS_PH`, `CARDS_PH`); `data-wr.js` – Wirtschaft (`DECKS_WR`, `CARDS_WR`)
 - `vendor/katex/` – KaTeX für Formeln (lokal, damit die App offline läuft)
 - `sw.js` – Service Worker (offline). Bei Änderungen `CACHE`-Version hochzählen.
 - `manifest.webmanifest`, `icons/` – Installation auf dem Home-Bildschirm
 
 ### Karten-Felder
-`id` (eindeutig, Physik mit Präfix `ph-`, W-Seminar mit `ws-`), `deck`, `term`, `def`, `ex`, `exs` (weitere Beispiele), `fx` (Wirkung/Merke),
+`id` (eindeutig, Physik mit Präfix `ph-`, Wirtschaft mit `wr-`; neues Fach = Eintrag in `SUBJ`, Präfix = Fach-Schlüssel), `deck`, `term`, `def`, `ex`, `exs` (weitere Beispiele), `fx` (Wirkung/Merke),
 `q` (eigene Frage, `term` ist dann die Antwort), `ql` (Fragezeile), `wrong` (falsche MC-Antworten), `grp` (feste Antwortgruppe),
 `cf` (Verwechslungsgruppe), `noMC` (nur Aufdecken), `gen()` (Zufallsaufgabe). Formeln in `$…$` (KaTeX, Brüche mit `\dfrac`).
 
