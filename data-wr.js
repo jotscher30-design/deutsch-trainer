@@ -244,9 +244,9 @@ const CARDS_WR = (() => {
       gen() {
         const s = scen(), { c, kv, p, Kf, x } = s;
         const right = `${f(x)} ${c.u}`, w = v => `${approx(v)}${f(v)} ${c.u}`;
-        return { q: L(`${c.firm}: ${kfun(Kf, kv)} (in € ${c.per}), Preis ${f(p)} € pro ${c.one}.`, 'Ab welcher Menge erzielt das Unternehmen Gewinn?'),
+        return { q: L(`${c.firm}: ${kfun(Kf, kv)} (in € ${c.per}), Preis ${f(p)} € pro ${c.one}.`, 'Wo liegt der Break-even-point (Gewinnschwelle)?'),
           term: right, wrong: three(right, [w(Kf / p), w(Kf / kv), w(Kf / (p + kv))], [w(x * 2), w(x + 5)]),
-          def: L(`$K(x) = E(x)$`, `$${m(Kf)} + ${m(kv)}x = ${m(p)}x$`, `$${m(Kf)} = ${m(p - kv)}x$`, `$x = ${m(x)}$ → ab ${f(x)} ${c.ud} ${c.per} Gewinn`) };
+          def: L(`$K(x) = E(x)$`, `$${m(Kf)} + ${m(kv)}x = ${m(p)}x$`, `$${m(Kf)} = ${m(p - kv)}x$`, `$x = ${m(x)}$ → bei ${f(x)} ${c.ud} ist G = 0, darüber Gewinn`) };
       },
       fx: 'Antwortsatz mit Einheit. Kontrolle: $\\dfrac{K_f}{p - k_v}$.' },
     { id: 'wr-z02', deck: 'rr', q: 'Gewinnmaximum berechnen', gn: 'Zufallsaufgabe – jedes Mal neue Zahlen.',
