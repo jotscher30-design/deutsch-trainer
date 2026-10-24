@@ -10,14 +10,8 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, vier Fächer:
   Werkzeuge (Einheiten, Zehnerpotenzen, Formeln umstellen, Mechanik-Basics), elektrisches Feld, Kondensator,
   Teilchen im Feld & Relativistik, Magnetfeld & Lorentzkraft; Induktion/Schwingkreis (12.2) und Wellen (12.3)
   sind vorbereitet, aber standardmäßig aus. Zufallsaufgaben erzeugen bei jeder Abfrage neue Zahlen.
-- **Wirtschaft** (52 Karten, seit 23.10.2026) – WR 12/1 BWL, Ex „Kosten, Erlös, Gewinn, Break-even“ am 28.10.2026:
-  Kostenbegriffe, Formeln, Verschiebungen im Kosten-Erlös-Diagramm, Fix oder variabel, Rechnen (Zufallsaufgaben
-  Break-even, Gewinnmaximum, Stückkosten, neuer Break-even nach Änderung). Grundlage: Skript S. 6–10 + Mitschrift.
-  Deck „Check-up“ (`manual`, `seq`): Aufgaben fürs Blatt in fester Reihenfolge, nur per Knopf, Lösung ggf. mit `tbl`;
-  `!!…!!` in Texten = gelb markierte Lücke, `miss: true` = Karte mit ⚠-Hinweis, Deck-Feld `nl` = neue Karten pro Einzelrunde.
-  `exam` in `SUBJ.wr`: bis zum Vortag kommt jede Karte nochmal, was am Vortag schwer war, am Prüfungstag.
-  (Das W-Seminar-Fach „Arbeitslosigkeit“ lief vom 17.–21.10.2026 und ist seit 23.10. entfernt – `data-wseminar.js` steht in der Git-Historie.)
-
+- **Wirtschaft** (18 Karten, seit 23.10.2026, seit 24.10. bewusst minimal) – WR 12/1 BWL, Ex „Kosten & Break-even“ am 28.10.2026:
+  eine Karte pro Fachbegriff (12) und eine pro Formel (6, nur Aufdecken). Grundlage: Skript S. 6–10. `exam` in `SUBJ.wr`.
 - **PuG** (49 Karten, seit 24.10.2026) – Kurzarbeit am 27.10.2026: Motive & Faktoren der deutschen Außenpolitik,
   Mindmap 1 (Organisationen, Mittel, Motive, Ziele), Mindmap 2 + Vorgaben des Grundgesetzes, IS-Narrative, Rolle der Medien,
   umfassende Sicherheit, OSZE mit Merksatz. Auswahl nach den Blurtings vom 24.10. Fach-Flag `direct` in `SUBJ.pol`:

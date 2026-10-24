@@ -14,7 +14,7 @@
     de: { id: 'de', name: 'Deutsch', decks: DECKS, cards: CARDS, mc: 0.65, npd: 5, goal: 12 },
     ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15 },
     // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
-    wr: { id: 'wr', name: 'Wirtschaft', decks: DECKS_WR, cards: CARDS_WR, mc: 0.6, npd: 15, goal: 30, exam: '2026-10-28', examName: 'Ex Kosten & Break-even' },
+    wr: { id: 'wr', name: 'Wirtschaft', decks: DECKS_WR, cards: CARDS_WR, mc: 0.6, npd: 18, goal: 20, exam: '2026-10-28', examName: 'Ex Kosten & Break-even' },
     // direct: neue Karten ohne Lern-Ansicht sofort abfragen (Stoff kennt Jonas schon vom Blatt) – eine Runde ≈ 20 Min
     pol: { id: 'pol', name: 'PuG', decks: DECKS_PG, cards: CARDS_PG, mc: 0, npd: 60, goal: 50, exam: '2026-10-27', examName: 'KA Außenpolitik & Terrorismus', direct: true },
   };
@@ -82,6 +82,8 @@
   if (S.mig < 7) { S.set.cur = 'wr'; S.mig = 7; }
   // 24.10.2026: PuG neu (KA 27.10.) – einmal direkt dort starten
   if (S.mig < 8) { S.set.cur = 'pol'; S.mig = 8; }
+  // 24.10.2026: Wirtschaft auf 18 Karten reduziert (Begriffe + Formeln) – alle an einem Tag neu
+  if (S.mig < 9) { S.set.wr.newPerDay = 18; S.set.wr.goal = 20; S.mig = 9; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
