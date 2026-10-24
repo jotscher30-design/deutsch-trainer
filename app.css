@@ -135,6 +135,7 @@ body[data-subj="ws"] { --accent: #5f3dc4; }
 .box.exam { border-color: var(--accent); }
 .seg.subj { padding: 4px; }
 .seg.subj button { padding: 10px 4px; font-size: 15px; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px; }
+@media (max-width: 420px) { .seg.subj button { font-size: 13.5px; padding: 10px 2px; gap: 3px; } .seg.subj .badge { padding: 1px 4px; min-width: 18px; font-size: 11px; } }
 .badge { display: inline-block; min-width: 20px; padding: 1px 6px; border-radius: 999px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; line-height: 18px; }
 .pill.focus { background: color-mix(in srgb, var(--accent) 18%, var(--card)); color: var(--accent); }
 .news { border-color: var(--accent); }

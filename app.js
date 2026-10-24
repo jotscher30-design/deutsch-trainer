@@ -1,11 +1,11 @@
-/* Abi-Trainer – Logik (Deutsch + Physik + Wirtschaft)
+/* Abi-Trainer – Logik (Deutsch + Physik + Wirtschaft + PuG)
  * Spaced Repetition (vereinfachtes SM-2), Active Recall, Interleaving, Wenn-Dann-Plan.
  * Themen-Status pro Fach: 0 = aus, 1 = normal, 2 = Fokus (neue Karten kommen dreimal so oft).
  * Alles lokal in localStorage – keine Server, keine Accounts.
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 7;
+  const NEWS = 8;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
@@ -15,8 +15,10 @@
     ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15 },
     // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
     wr: { id: 'wr', name: 'Wirtschaft', decks: DECKS_WR, cards: CARDS_WR, mc: 0.6, npd: 15, goal: 30, exam: '2026-10-28', examName: 'Ex Kosten & Break-even' },
+    // direct: neue Karten ohne Lern-Ansicht sofort abfragen (Stoff kennt Jonas schon vom Blatt) – eine Runde ≈ 20 Min
+    pol: { id: 'pol', name: 'PuG', decks: DECKS_PG, cards: CARDS_PG, mc: 0, npd: 60, goal: 50, exam: '2026-10-27', examName: 'KA Außenpolitik & Terrorismus', direct: true },
   };
-  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WR];
+  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WR, ...DECKS_PG];
 
   /* ───────── Hilfen ───────── */
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
@@ -78,6 +80,8 @@
   if (S.mig < 6) S.mig = 6;
   // 23.10.2026: Wirtschaft ersetzt das W-Seminar – einmal direkt dort starten (Ex 28.10.)
   if (S.mig < 7) { S.set.cur = 'wr'; S.mig = 7; }
+  // 24.10.2026: PuG neu (KA 27.10.) – einmal direkt dort starten
+  if (S.mig < 8) { S.set.cur = 'pol'; S.mig = 8; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
@@ -178,7 +182,7 @@
       for (let i = 0; gens.length && items.length < 12 && i < 30; i++) items.push({ card: gens[i % gens.length], mode: 'mc', extra: true });
       shuffle(items);
       const fresh = all.filter(c => !S.cards[c.id]).slice(0, deckOf(deck).nl || 6); // nl: mehr neue Karten pro Runde erlauben
-      fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, { card, mode: 'learn' }));
+      fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, SUBJ[k].direct ? { card, mode: 'flash', fresh: true } : { card, mode: 'learn' }));
     } else if (extra) {
       const seen = enabled(k).filter(c => S.cards[c.id]);
       const pool = seen.length >= 6 ? seen : enabled(k);
@@ -195,7 +199,7 @@
         while (r >= w[i]) { r -= w[i]; i++; }
         fresh.push(by[ds[i]].shift());
       }
-      fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, { card, mode: 'learn' }));
+      fresh.forEach((card, idx) => items.splice(Math.min(items.length, idx * 3), 0, SUBJ[k].direct ? { card, mode: 'flash', fresh: true } : { card, mode: 'learn' }));
     }
     sess = { items, pos: 0, done: 0, correct: 0, requeued: {}, k, deck };
   }
@@ -208,6 +212,7 @@
   function record(it, rating) {
     const card = it.card, h = H(today(), sess.k);
     h.r++; if (rating >= 3) { h.c++; sess.correct++; }
+    if (it.fresh && !S.cards[card.id]) h.n++; // direct-Fach: neue Karte zählt beim ersten Bewerten
     sess.done++;
     rate(card.id, rating, { extra: it.extra });
     if (rating === 1) requeue(it);
@@ -239,7 +244,7 @@
     const presets = ['Wenn ich morgens im Bus sitze', 'Wenn ich das Mathe-Blatt fertig habe', 'Wenn ich abends die Zähne geputzt habe', 'Wenn ich in der Pause aufs Handy schaue'];
     app.innerHTML = `
       <h1>Abi-Trainer</h1>
-      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und Wirtschaft (${CARDS_WR.length} Karten: Kosten, Erlös, Gewinn, Break-even). Nach dem Lehrplan der 12.</p>
+      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und Wirtschaft (${CARDS_WR.length} Karten: Kosten, Erlös, Gewinn, Break-even) und PuG (${CARDS_PG.length} Karten: Außenpolitik, Terrorismus). Nach dem Lehrplan der 12.</p>
       <div class="box">
         <p><b>So funktioniert es</b></p>
         <p class="muted">Jeden Tag ein paar Minuten pro Fach. Die App fragt dich ab (nicht du liest nach) und zeigt dir jede Karte genau dann wieder, wenn du sie fast vergessen hättest. Das ist der Unterschied zwischen „vor der Schulaufgabe neu lernen“ und „sitzt“.</p>
@@ -290,9 +295,9 @@
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
       ${dl >= 0 ? `<div class="box exam"><b>${cur().examName}: ${dl === 0 ? 'heute' : dl === 1 ? 'morgen' : `in ${dl} Tagen`}</b><p class="muted small" style="margin:4px 0 0">${dl <= 1 ? 'Nur noch Abruf: fällige Karten, dann einzelne Themen.' : 'Alle Karten sind spätestens am Vortag nochmal dran.'}</p></div>` : ''}
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: Wirtschaft – Ex am 28.10.</b></p>
-        <p class="muted small" style="margin:0 0 6px">Skript S. 6–10: Kostenbegriffe, Formeln, Verschiebungen im Diagramm, Fix oder variabel, Rechnen mit Zufallszahlen. Check-up = aus dem Kopf aufs Blatt. ⚠ = Fehler aus deiner Mitschrift. Das W-Seminar ist raus (Ex geschrieben), dein Verlauf bleibt.</p>
-        ${k !== 'wr' ? `<button class="btn" data-subj="wr" style="padding:10px">Zu Wirtschaft</button>` : ''}
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: PuG – Kurzarbeit am 27.10.</b></p>
+        <p class="muted small" style="margin:0 0 6px">${CARDS_PG.length} Karten aus deinen Blurtings: Motive & Faktoren, beide Mindmaps, Grundgesetz, IS-Narrative, Medien, umfassende Sicherheit, OSZE. Nur Aufdecken, keine Lern-Ansicht – eine Runde dauert etwa 20 Minuten. Wiederholen: unten „Einzeln abfragen“ oder „Extra-Runde“.</p>
+        ${k !== 'pol' ? `<button class="btn" data-subj="pol" style="padding:10px">Zu PuG</button>` : ''}
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       ${SUBJ[k].decks.some(d => d.seq) ? SUBJ[k].decks.filter(d => d.seq).map(d => `<div class="box checkup"><b>${d.name}</b><p class="muted small" style="margin:4px 0 10px">${SUBJ[k].cards.filter(c => c.deck === d.id).length} Aufgaben fürs Blatt: erst schreiben, dann aufdecken und vergleichen. Gelb = hat beim letzten Mal gefehlt.</p><button class="btn primary" data-checkup="${d.id}">Check-up starten</button></div>`).join('') : ''}
       <div class="box center">
@@ -444,7 +449,7 @@
   function renderLex() {
     const k = K(), cs = cur().cards;
     app.innerHTML = `${subjSwitch(false)}<h1 style="margin-top:14px">Lexikon</h1><p class="muted">Alle ${cs.length} ${cur().name}-Karten zum Nachschlagen – auch vor der Klausur.</p>
-      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'wr' ? 'Suchen … (z. B. Fixkosten, Break-even, Stückkosten)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
+      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'wr' ? 'Suchen … (z. B. Fixkosten, Break-even, Stückkosten)' : k === 'pol' ? 'Suchen … (z. B. OSZE, Grundgesetz, Core Story)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
     const list = $('#list');
     const hay = c => [c.term, c.q, c.def, c.ex, (c.exs || []).join(' '), c.fx].join(' ').toLowerCase();
     const draw = () => {
@@ -514,7 +519,7 @@
         <button class="btn" id="exp">Fortschritt exportieren</button>
         <button class="btn" id="impBtn">Fortschritt importieren</button><input type="file" id="imp" accept="application/json" style="display:none">
         <button class="btn ghost" id="reset" style="color:var(--bad)">Fortschritt zurücksetzen</button></div>
-      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + Wirtschaft ${CARDS_WR.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
+      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + Wirtschaft ${CARDS_WR.length} + PuG ${CARDS_PG.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
     $('#npd').onclick = e => { const b = e.target.closest('button'); if (b) { c.newPerDay = +b.dataset.v; save(); render(); } };
     $('#goal').onclick = e => { const b = e.target.closest('button'); if (b) { c.goal = +b.dataset.v; save(); render(); } };
     $('#decks').onclick = e => {

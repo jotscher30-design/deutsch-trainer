@@ -1,6 +1,6 @@
 # Abi-Trainer (ehemals Deutsch-Trainer)
 
-Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
+Tägliche Abfrage-App (PWA) für die Oberstufe, vier Fächer:
 
 - **Deutsch** (291 Karten) – Schwerpunkt Stilmittel (inkl. Verwechslungspaare und mehrere Beispiele pro Mittel),
   Argumentation & Sachtext (Argumenttypen, Konnektoren, Fehlschlüsse, Erörterungsaufbau) und Literaturepochen
@@ -18,6 +18,12 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
   `exam` in `SUBJ.wr`: bis zum Vortag kommt jede Karte nochmal, was am Vortag schwer war, am Prüfungstag.
   (Das W-Seminar-Fach „Arbeitslosigkeit“ lief vom 17.–21.10.2026 und ist seit 23.10. entfernt – `data-wseminar.js` steht in der Git-Historie.)
 
+- **PuG** (49 Karten, seit 24.10.2026) – Kurzarbeit am 27.10.2026: Motive & Faktoren der deutschen Außenpolitik,
+  Mindmap 1 (Organisationen, Mittel, Motive, Ziele), Mindmap 2 + Vorgaben des Grundgesetzes, IS-Narrative, Rolle der Medien,
+  umfassende Sicherheit, OSZE mit Merksatz. Auswahl nach den Blurtings vom 24.10. Fach-Flag `direct` in `SUBJ.pol`:
+  neue Karten ohne Lern-Ansicht sofort zum Aufdecken (eine Runde ≈ 20 Min). IDs `pol-` (Fach-Schlüssel nicht `pg`,
+  weil es in Physik ein Deck `pg` gibt).
+
 ## Lernprinzipien
 - **Active Recall / Testing-Effekt:** Jede Karte wird abgefragt (Multiple Choice oder Aufdecken + Selbsteinschätzung), nicht gelesen.
 - **Spaced Repetition:** vereinfachtes SM-2. Bewertung 1–4 bestimmt das nächste Intervall. Karten mit Intervall ≥ 21 Tage gelten als „sitzt“.
@@ -26,7 +32,7 @@ Tägliche Abfrage-App (PWA) für die Oberstufe, drei Fächer:
 
 ## Dateien
 - `index.html`, `app.css`, `app.js` – App (Vanilla JS, kein Build)
-- `data.js` – Deutsch (`DECKS`, `CARDS`); `data-physik.js` – Physik (`DECKS_PH`, `CARDS_PH`); `data-wr.js` – Wirtschaft (`DECKS_WR`, `CARDS_WR`)
+- `data.js` – Deutsch (`DECKS`, `CARDS`); `data-physik.js` – Physik (`DECKS_PH`, `CARDS_PH`); `data-wr.js` – Wirtschaft (`DECKS_WR`, `CARDS_WR`); `data-pug.js` – PuG (`DECKS_PG`, `CARDS_PG`)
 - `vendor/katex/` – KaTeX für Formeln (lokal, damit die App offline läuft)
 - `sw.js` – Service Worker (offline). Bei Änderungen `CACHE`-Version hochzählen.
 - `manifest.webmanifest`, `icons/` – Installation auf dem Home-Bildschirm
