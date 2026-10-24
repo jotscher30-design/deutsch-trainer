@@ -14,6 +14,7 @@ const DECKS = [
   { id: 'lyrik',   name: 'Lyrik – Form & Metrik',           short: 'Lyrik',      color: '#1971c2', q: 'Welcher Begriff?', def: 1 },
   { id: 'epik',    name: 'Epik – Erzähltechnik',            short: 'Epik',       color: '#2f9e44', q: 'Welcher Begriff?', def: 1 },
   { id: 'drama',   name: 'Drama – Aufbau & Theorie',        short: 'Drama',      color: '#9c36b5', q: 'Welcher Begriff?', def: 1 },
+  { id: 'dana',    name: 'Dramenanalyse (Blätter Amler)',   short: 'Dramenanalyse', color: '#a61e4d', q: 'Welcher Begriff?', def: 2 },
   { id: 'sprache', name: 'Sprach- & Kommunikationstheorie', short: 'Sprachtheorie', color: '#0c8599', q: 'Welcher Begriff?', def: 0 },
 ];
 
@@ -407,6 +408,95 @@ const CARDS = [
   { id:'d23', deck:'drama', term:'Drei Einheiten', def:'Einheit von Ort, Zeit (ein Tag) und Handlung (ein Strang) – aus Aristoteles abgeleitete Regel für das geschlossene Drama.', ex:'Gottsched fordert sie; Lessing lockert; Sturm und Drang bricht sie', fx:'Nur die Einheit der Handlung steht wirklich bei Aristoteles.' },
   { id:'d24', deck:'drama', term:'Deus ex machina', def:'Unerwartete, „von außen“ kommende Lösung eines Konflikts, die aus der Handlung nicht folgt.', ex:'Die drei Götter im „Guten Menschen von Sezuan“ (ironisch); antike Bühnenmaschine', fx:'Lateinisch „Gott aus der Maschine“; meist kritisch gemeint.' },
   { id:'d25', deck:'drama', term:'Dramatischer Konflikt', def:'Zentraler Gegensatz, der die Handlung antreibt: zwischen Figuren, zwischen Figur und Gesellschaft, oder innerhalb einer Figur.', ex:'Pflicht vs. Neigung (Klassik); Individuum vs. Gesellschaft (Woyzeck)', fx:'Erste Frage der Dramenanalyse: Wer will was gegen wen?' },
+
+
+  /* ───────────── DRAMENANALYSE – nur aus den Blättern der Lehrkraft (ByCS Drive, D3 Amler, 23.10.2026) ─────────────
+   * Quelle: Methodenblatt „Dramenszenen erschließen“, Nachschlageblatt „Dramenanalyse – Fachbegriffe“, Übersicht „Aufbau Dramenanalyse“.
+   * Allgemeine Stilmittel vom Nachschlageblatt (Metapher, Vergleich, Ironie …) stehen schon im Deck Stilmittel → hier nur als Überblick (dn48). */
+  { id:'dn01', deck:'dana', term:'Aufbau einer Dramenanalyse', ql:'Welche 4 Teile – und was gehört in welchen?', noMC:true,
+    def:'1. Einleitung: Hinführung, Basissatz, Deutungshypothese\n2. Hauptteil: Szenenverlauf und Konflikt, Figuren und Beziehungen, Figurenrede und Sprache – Beobachtung und Deutung verbunden\n3. Gesamtdeutung = Deutung der Szenenfunktion\n4. Schluss',
+    fx:'Die Gliederung folgt deiner Deutung der Szene – nicht umgekehrt. Die Teile müssen einen nachvollziehbaren Gedankengang ergeben.' },
+  { id:'dn02', deck:'dana', grp:'aufbau', ql:'Welcher Teil der Einleitung?', term:'Hinführung',
+    def:'Zum Thema oder zentralen Konflikt leiten – über eine thematische Beobachtung, eine Frage oder einen passenden literaturgeschichtlichen Zusammenhang.',
+    fx:'Erster Baustein der Einleitung, vor Basissatz und Deutungshypothese.' },
+  { id:'dn03', deck:'dana', grp:'aufbau', ql:'Welcher Teil der Einleitung?', term:'Basissatz',
+    def:'Autorin/Autor, Titel, Textsorte bzw. Dramenform und Entstehungszeit (sofern bekannt bzw. relevant) nennen und den untersuchten Szenenausschnitt knapp einordnen.',
+    fx:'Zweiter Baustein der Einleitung.' },
+  { id:'dn04', deck:'dana', grp:'aufbau', ql:'Welcher Teil der Einleitung?', term:'Deutungshypothese',
+    def:'Grundlegende These zur Szene: Welcher Konflikt oder welche Entwicklung steht im Mittelpunkt, und was wird daran sichtbar?',
+    fx:'Dritter Baustein der Einleitung. Darf sich beim genaueren Untersuchen noch verändern.' },
+  { id:'dn05', deck:'dana', grp:'aufbau', ql:'Welcher Teil der Analyse?', term:'Gesamtdeutung',
+    def:'Die zentralen Analyseergebnisse verknüpfen und daraus begründen, welche Bedeutung die Szene für die Figuren, den Konflikt und den weiteren Handlungsverlauf hat.',
+    fx:'Heißt auf dem Blatt auch „Deutung der Szenenfunktion“. Die Stellung der Szene im Handlungsverlauf kannst du am Anfang klären – ihre genaue Bedeutung und Funktion wird erst durch die Analyse begründet.' },
+  { id:'dn06', deck:'dana', grp:'aufbau', ql:'Welcher Teil der Analyse?', term:'Schluss',
+    def:'Die Deutung abrunden: einen Gedanken zuspitzen, einen größeren Zusammenhang herstellen oder eine weiterführende Frage aufwerfen.',
+    fx:'Keine bloße Wiederholung des Hauptteils.' },
+  { id:'dn07', deck:'dana', term:'Hauptteil – die 4 Bausteine', ql:'Was untersuchst du in jedem Baustein?', noMC:true,
+    def:'Szenenverlauf und Konflikt: Geschehen und Entwicklung; Stellung der Szene im Handlungsverlauf; wie sich der Konflikt zuspitzt, verändert oder einer Lösung nähert.\nFiguren und Beziehungen: Absichten, Motive, Gefühle, Verhalten; Beziehungen und Veränderungen im Machtgefüge.\nFigurenrede und Sprache: Gesprächsverhalten, Redeanteile, sprachliche Gestaltung, Regieanweisungen – was zeigen sie über Figuren, Beziehungen und Konflikt?\nBeobachtung und Deutung verbinden: Aussagen mit Textbelegen stützen, Bedeutung erläutern, Aspekte verknüpfen statt aufzählen.' },
+  { id:'dn08', deck:'dana', term:'Weg A: dem Szenenverlauf folgen', ql:'Grundidee und Vorgehen?', noMC:true,
+    def:'Grundidee: Szene Schritt für Schritt durchgehen – wie entwickeln sich Handlung, Gespräch und Konflikt?\n1. Szene in Gesprächs- oder Handlungsschritte gliedern.\n2. Erklären, was jeweils geschieht und wie die Figuren reagieren.\n3. Passende Beobachtungen zu Figurenverhalten, Figurenrede, Regieanweisungen und Sprache einbeziehen.\n4. Deuten, wie diese Aspekte Entwicklung und Bedeutung der Szene prägen.',
+    fx:'Beide Wege sind erlaubt. Gefahr bei A: bloßes Nacherzählen – immer Textbeleg, Beobachtung und Deutung verknüpfen.' },
+  { id:'dn09', deck:'dana', term:'Weg B: nach Aspekten untersuchen', ql:'Grundidee und Vorgehen?', noMC:true,
+    def:'Grundidee: Aspekte erst getrennt untersuchen, dann zusammenführen.\n1. Inhalt, Konflikt und Entwicklung der Szene.\n2. Figuren, Beziehungen und Absichten.\n3. Figurenrede, Sprechweise und sprachliche Gestaltung.\n4. Ergebnisse zusammenführen: Was zeigen sie über die Szene und ihre Funktion?',
+    fx:'Beide Wege sind erlaubt. Gefahr bei B: bloße Aufzählung von Beobachtungen – die Zusammenführung am Ende ist entscheidend.' },
+  { id:'dn10', deck:'dana', term:'Vorbereitung einer Dramenszene', ql:'Welche 5 Schritte vor dem Schreiben?', noMC:true,
+    def:'1. Lesen und verstehen: mehrmals lesen, Verständnisfragen klären, in eigenen Worten zusammenfassen, Auffälligkeiten markieren.\n2. Situation und Handlungsverlauf klären: Welche Figuren? Was ist unmittelbar zuvor geschehen? Welcher Konflikt steht im Zentrum?\n3. Erste Deutungsidee festhalten – darf sich noch ändern.\n4. Szenenaufbau erfassen: in Gesprächs- oder Handlungsschritte gliedern.\n5. Untersuchung vorbereiten: Aspekte festlegen (Inhalt und Konflikt, Figuren und Beziehungen, Figurenrede und Sprache).',
+    fx:'Zum Schluss: Ergebnisse gewichten, zu einer begründeten Deutung verknüpfen und daraus einen klaren Schreibplan machen.' },
+  { id:'dn11', deck:'dana', term:'Leitfragen – 4 Bereiche', ql:'Welche 4 Bereiche – und was fragst du jeweils?', noMC:true,
+    def:'Inhalt und Konflikt: Was geschieht? Wie entwickelt sich der zentrale Konflikt? Welche Wendungen, Zuspitzungen, Verwicklungen?\nFiguren und Beziehungen: Absichten, Motive, Gedanken, Gefühle? Wie stehen sie zueinander, was verändert sich? Was verraten Verhalten und Regieanweisungen?\nFigurenrede und Sprache: Wie sprechen die Figuren miteinander? Welche sprachlichen und dramaturgischen Auffälligkeiten? Wie beeinflussen sie Beziehungen und Konflikt?\nSzenenfunktion: Wie hängt die Szene mit dem bisherigen und weiteren Verlauf zusammen? Welche Bedeutung hat sie für den Konflikt und das Verständnis des Dramas?',
+    fx:'Nur die für die Szene relevanten Aspekte untersuchen. Nicht jedes sprachliche Mittel ist wichtig – entscheidend ist, was es im Zusammenhang erkennen lässt.' },
+  { id:'dn12', deck:'dana', term:'Von der Beobachtung zur Deutung', ql:'Welcher Dreischritt – und worauf musst du achten?', noMC:true,
+    def:'Beobachtung → Textbeleg → Funktion / Deutung.\nBeschreiben, was im Haupt- oder Nebentext auffällt, konkret belegen und erklären, was es für die Figuren, den Konflikt oder den Verlauf der Szene bedeutet.',
+    ex:'„Die knappen, unmittelbar aufeinanderfolgenden Äußerungen (Z. …) lassen den Dialog wie einen Schlagabtausch wirken. Dadurch wird die Konfrontation zwischen den Figuren sprachlich zugespitzt.“',
+    fx:'Die Funktion eines Mittels ergibt sich nicht automatisch aus seinem Namen – begründe sie mit Wortlaut, Gesprächssituation und Konflikt der konkreten Szene. Keine Beobachtung ohne Erklärung.' },
+
+  /* Aufbau und Textebenen */
+  { id:'dn20', deck:'dana', cf:'ebene', term:'Akt', def:'Größerer Hauptabschnitt eines Dramas; ein Drama kann in mehrere davon gegliedert sein.', fx:'Achte auf: Welche Funktion hat der Abschnitt im Gesamtverlauf?' },
+  { id:'dn21', deck:'dana', cf:'ebene', term:'Szene', def:'Handlungseinheit innerhalb eines Aktes; abgegrenzt etwa durch einen Ortswechsel oder den Auf- bzw. Abtritt von Figuren.', fx:'Achte auf: Welche Figuren sind anwesend, und was verändert sich?' },
+  { id:'dn22', deck:'dana', cf:'ebene', term:'Auftritt', def:'Kleinere Spieleinheit, die häufig mit dem Erscheinen oder Abgehen einer Figur beginnt bzw. endet.', fx:'Achte auf: Was verändert sich durch das Hinzukommen oder Weggehen einer Figur?' },
+  { id:'dn23', deck:'dana', cf:'text', term:'Haupttext', def:'Die von den Figuren gesprochenen Äußerungen.', fx:'Achte auf: Was sagen die Figuren ausdrücklich? Was lässt sich zwischen den Zeilen erkennen?' },
+  { id:'dn24', deck:'dana', cf:'text', term:'Nebentext', def:'Regieanweisungen, z. B. zu Ort, Bühnenbild, Bewegung, Mimik, Gestik oder Sprechweise.', fx:'Achte auf: Wie prägt er das Verständnis der Situation und der Figuren?' },
+  { id:'dn25', deck:'dana', cf:'ebene', term:'Figurenkonstellation', def:'Gesamtheit der Beziehungen zwischen den handelnden Personen und ihrer Stellung zueinander.', fx:'Achte auf: Wer steht in welchem Verhältnis zu wem? Wo zeigen sich Nähe, Abhängigkeit oder Gegensätze?' },
+  { id:'dn26', deck:'dana', term:'Dramatischer Konflikt', def:'Gegensatz zwischen Interessen, Zielen, Werten oder Bedürfnissen, der die Handlung vorantreibt.', fx:'Achte auf: Was wollen die Figuren, was steht dem entgegen, und wie verändert sich der Konflikt?' },
+
+  /* Figuren und Charakterisierung */
+  { id:'dn27', deck:'dana', cf:'char', term:'Direkte Charakterisierung', def:'Eine Eigenschaft oder Information wird ausdrücklich genannt – durch die Figur selbst, andere Figuren oder den Nebentext.', fx:'Achte auf: Wer charakterisiert wen? Ist die Aussage zuverlässig oder interessengeleitet?' },
+  { id:'dn28', deck:'dana', cf:'char', term:'Indirekte Charakterisierung', def:'Eigenschaften werden aus Verhalten, Entscheidungen, Äußerungen oder berichteten Handlungen erschlossen.', fx:'Achte auf: Welche konkreten Hinweise stützen die Schlussfolgerung?' },
+  { id:'dn29', deck:'dana', cf:'fig', term:'Figurentyp', def:'Eher einheitlich und wenig veränderlich angelegt, oft durch eine dominante Eigenschaft geprägt.', fx:'Achte auf: Welche Eigenschaft bestimmt das Verhalten? Bleibt sie konstant?' },
+  { id:'dn30', deck:'dana', cf:'fig', term:'Charakter', def:'Komplex und individuell angelegt; Einstellungen und Verhalten zeigen sich differenziert und können sich verändern.', fx:'Achte auf: Zeigen sich Widersprüche oder Entwicklungen?' },
+  { id:'dn31', deck:'dana', cf:'fig', term:'Idealisierte Figur', def:'Verkörpert ein bestimmtes Leitbild und kann als Vorbild erscheinen.', fx:'Achte auf: Welches Ideal wird sichtbar, und wie wird es gestaltet?' },
+  { id:'dn32', deck:'dana', term:'Wendepunkt', def:'Moment, in dem sich die Richtung der Handlung oder die Lage einer Figur entscheidend verändert.', fx:'Achte auf: Welche neue Erkenntnis, Entscheidung oder Handlung verändert den weiteren Verlauf?' },
+
+  /* Formen der Figurenrede */
+  { id:'dn33', deck:'dana', cf:'rede', term:'Monolog', def:'Eine Figur spricht längere Zeit ohne unmittelbaren Sprecherwechsel.', fx:'Kann Gedanken und Gefühle entfalten, Konflikte sichtbar machen oder Entscheidungen vorbereiten.' },
+  { id:'dn34', deck:'dana', cf:'rede', term:'Dialog', def:'Gespräch zwischen zwei oder mehr Figuren.', fx:'Achte auf: Wie verläuft das Gespräch? Wer bestimmt es, und wie verändert sich die Beziehung?' },
+  { id:'dn35', deck:'dana', cf:'rede', term:'Stichomythie', def:'Rascher Wechsel der Sprecher von Vers zu Vers.', fx:'Kann Schlagabtausch, Konfrontation, Spannung oder sprachliche Zuspitzung erzeugen.' },
+  { id:'dn36', deck:'dana', cf:'rede', term:'Antilabe', def:'Ein Vers wird auf mehrere Sprecher verteilt.', fx:'Achte auf: Wie wirken Unterbrechung, Dringlichkeit oder das enge Gegeneinander der Stimmen?' },
+  { id:'dn37', deck:'dana', cf:'bericht', term:'Botenbericht', def:'Eine Figur berichtet von einem Ereignis, das nicht auf der Bühne dargestellt wird.', fx:'Achte auf: Welche Informationen vermittelt er, und warum wird das Ereignis berichtet statt gezeigt?' },
+  { id:'dn38', deck:'dana', cf:'bericht', term:'Teichoskopie / Mauerschau', def:'Eine Figur schildert ein Geschehen, das sie von der Bühne aus beobachtet.', fx:'Achte auf: Wie werden Ereignisse und Reaktionen für das Publikum vermittelt?' },
+
+  /* Gesprächsverhalten und Gesprächsstrategien */
+  { id:'dn39', deck:'dana', cf:'gespr', term:'Redeanteile', def:'Umfang und Verteilung der Äußerungen zwischen den Figuren.', fx:'Achte auf: Wer spricht viel oder wenig? Wer erhält Raum, wer wird übergangen?' },
+  { id:'dn40', deck:'dana', cf:'gespr', term:'Unterbrechen', def:'Eine Figur setzt ein, bevor die andere ihren Beitrag beendet hat.', fx:'Achte auf: Wird die andere Figur kontrolliert, bedrängt, zurückgewiesen – oder entsteht Dringlichkeit?' },
+  { id:'dn41', deck:'dana', cf:'gespr', term:'Ausweichen', def:'Eine Figur geht einer Frage oder einem Gesprächspunkt aus dem Weg.', fx:'Achte auf: Was soll nicht ausgesprochen oder offengelegt werden?' },
+  { id:'dn42', deck:'dana', cf:'gespr', term:'Beschwichtigen', def:'Eine Figur versucht, Erregung oder Konflikt zu mildern.', fx:'Achte auf: Soll die Situation beruhigt, Zeit gewonnen oder ein Konflikt verdeckt werden?' },
+  { id:'dn43', deck:'dana', cf:'gespr', term:'Drohung / Appell', def:'Eine Äußerung kündigt negative Folgen an oder fordert eine andere Figur zu etwas auf.', fx:'Achte auf: Welcher Druck wird ausgeübt, und wie reagiert die angesprochene Figur?' },
+  { id:'dn44', deck:'dana', cf:'gespr', term:'Ironisieren', def:'Eine Figur äußert sich so, dass ein Gegensatz zwischen Wortlaut und gemeinter Haltung erkennbar wird.', fx:'Achte auf: Welche Kritik, Distanz oder Abwertung wird indirekt vermittelt?' },
+
+  /* Sprache – drama-typisch */
+  { id:'dn45', deck:'dana', cf:'vers', term:'Blankvers', def:'Reimloser fünfhebiger Jambus; häufig in traditionellen Dramen verwendet.', fx:'Achte auf: Ist der Vers regelmäßig? Welche Abweichungen sind auffällig und im Zusammenhang bedeutsam?' },
+  { id:'dn46', deck:'dana', cf:'vers', term:'Prosa', def:'Verslose, nicht metrisch gebundene Sprache.', fx:'Achte auf: Welche Wirkung hat die Sprachform im konkreten Drama und in der Szene?' },
+  { id:'dn47', deck:'dana', cf:'vers', term:'Dialekt / Soziolekt', def:'Sprachformen, die auf regionale Herkunft oder eine soziale Gruppe verweisen können.', fx:'Achte auf: Was wird über Herkunft, Zugehörigkeit oder soziale Unterschiede erkennbar?' },
+  { id:'dn48', deck:'dana', term:'Weitere sprachliche Mittel im Drama', ql:'Welche 8 nennt das Nachschlageblatt – und worauf achtest du jeweils?', noMC:true,
+    def:'Metapher: Welche Vorstellung wird eröffnet, was sagt sie über Situation oder Figur?\nVergleich: Welche Gemeinsamkeit wird hervorgehoben?\nIronie: Welche Haltung, Kritik oder Distanz wird indirekt vermittelt?\nRhetorische Frage: Lenkt sie das Gegenüber, verstärkt sie einen Appell, drückt sie Zweifel aus?\nWiederholung: Was wird betont – Nachdruck, Dringlichkeit, Fixierung?\nAntithese: Welcher Konflikt oder Werteunterschied wird hervorgehoben?\nEllipse: Wirkt die Äußerung verdichtet, abgebrochen, erregt, besonders knapp?\nAusruf / Interjektion: Welche Emotion oder Haltung wird unmittelbar hörbar?',
+    fx:'Die Definitionen übst du im Deck Stilmittel. Hier zählt die Frage dahinter: Was zeigt das Mittel über Figuren, Beziehung und Konflikt?' },
+
+  /* Funktionen der Figurenrede */
+  { id:'dn50', deck:'dana', grp:'funk', ql:'Welche Funktion der Figurenrede?', term:'Expressiv', def:'Gefühle und innere Zustände ausdrücken.' },
+  { id:'dn51', deck:'dana', grp:'funk', ql:'Welche Funktion der Figurenrede?', term:'Referentiell', def:'Sachverhalte, Informationen oder Ereignisse mitteilen.' },
+  { id:'dn52', deck:'dana', grp:'funk', ql:'Welche Funktion der Figurenrede?', term:'Appellativ', def:'Andere zu etwas auffordern, bewegen oder beeinflussen.' },
+  { id:'dn53', deck:'dana', grp:'funk', ql:'Welche Funktion der Figurenrede?', term:'Kontaktbezogen (phatisch)', def:'Die Verbindung zum Gegenüber herstellen oder aufrechterhalten.' },
+  { id:'dn54', deck:'dana', grp:'funk', ql:'Welche Funktion der Figurenrede?', term:'Strategisch', def:'Das Gegenüber überzeugen, unter Druck setzen, täuschen, beschwichtigen oder die Gesprächsführung übernehmen.' },
 
   /* ───────────── SPRACH- & KOMMUNIKATIONSTHEORIE (pausiert) ───────────── */
   { id:'k01', deck:'sprache', term:'Organon-Modell (Bühler)', def:'Sprachliches Zeichen hat drei Funktionen: Ausdruck (Beziehung zum Sender), Appell (zum Empfänger), Darstellung (zu Gegenständen/Sachverhalten).', ex:'„Es zieht!“ = Darstellung (offenes Fenster) + Ausdruck (ich friere) + Appell (mach zu)', fx:'Karl Bühler 1934; Organon = Werkzeug. Grundlage für Schulz von Thun.' },
