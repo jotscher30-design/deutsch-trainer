@@ -40,7 +40,7 @@ const CARDS_WR = [
 
   /* ───────────── UNTERNEHMENSZIELE (Skript S. 3–4, nötig für S. 9 Aufg. 3) ───────────── */
   { id: 'wr-u01', deck: 'rb', grp: 'ziel', term: 'Ökonomische Ziele', def: 'Hoher Umsatz, hoher Gewinn, Erhalt der Unternehmensstruktur, Marktanteile sichern.' },
-  { id: 'wr-u02', deck: 'rb', grp: 'ziel', term: 'Ökologische Ziele', def: 'Umweltschutz, Ressourcenschonung, Klimaziele erreichen.' },
+  { id: 'wr-u02', deck: 'rb', grp: 'ziel', term: 'Ökologische Ziele', def: 'Umweltschutz, Ressourcenschonung, Klimaschutz.' },
   { id: 'wr-u03', deck: 'rb', grp: 'ziel', term: 'Soziale Ziele', def: 'Faire Löhne, faire Arbeitsbedingungen, Mitarbeiterzufriedenheit, gesellschaftliches Engagement.' },
   { id: 'wr-u04', deck: 'rb', grp: 'ziel', term: 'Ethische Ziele', def: 'Gleichberechtigung, Toleranz, Gerechtigkeit, Verantwortung für die Welt.' },
   { id: 'wr-u05', deck: 'rb', grp: 'bez', term: 'Konkurrierende Ziele', def: 'Die Verwirklichung des einen geht auf Kosten des anderen.',
