@@ -2,6 +2,7 @@
  * Grundlage: Skript der Lehrerin S. 6–10 „1.6 Kosten, Erträge und Gewinne als Einflussfaktoren auf unternehmerische
  * Entscheidungen“ (Beispiel AMA AG). Ex am 28.10.2026.
  * Seit 24.10.2026 bewusst minimal (Jonas' Wunsch): eine Karte pro Fachbegriff, eine pro Formel – sonst nichts.
+ * 25.10.2026: Unternehmensziele + Zielbeziehungen (S. 3–4) ergänzt, weil S. 9 Aufg. 3 sie braucht.
  *
  * Felder wie in data.js / data-physik.js. IDs mit Präfix `wr-`, nie ändern.
  */
@@ -36,6 +37,18 @@ const CARDS_WR = [
     ex: 'AMA AG: 8 Busse' },
   { id: 'wr-b12', deck: 'rb', term: 'Gewinnmaximum $G_{max}$', def: 'Höchster erreichbarer Überschuss – bei linearem Verlauf an der Kapazitätsgrenze.',
     ex: 'AMA AG: G(18) = 1.800.000 €' },
+
+  /* ───────────── UNTERNEHMENSZIELE (Skript S. 3–4, nötig für S. 9 Aufg. 3) ───────────── */
+  { id: 'wr-u01', deck: 'rb', grp: 'ziel', term: 'Ökonomische Ziele', def: 'Hoher Umsatz, hoher Gewinn, Erhalt der Unternehmensstruktur, Marktanteile sichern.' },
+  { id: 'wr-u02', deck: 'rb', grp: 'ziel', term: 'Ökologische Ziele', def: 'Umweltschutz, Ressourcenschonung, Klimaziele erreichen.' },
+  { id: 'wr-u03', deck: 'rb', grp: 'ziel', term: 'Soziale Ziele', def: 'Faire Löhne, faire Arbeitsbedingungen, Mitarbeiterzufriedenheit, gesellschaftliches Engagement.' },
+  { id: 'wr-u04', deck: 'rb', grp: 'ziel', term: 'Ethische Ziele', def: 'Gleichberechtigung, Toleranz, Gerechtigkeit, Verantwortung für die Welt.' },
+  { id: 'wr-u05', deck: 'rb', grp: 'bez', term: 'Konkurrierende Ziele', def: 'Die Verwirklichung des einen geht auf Kosten des anderen.',
+    ex: 'Faire Löhne ↔ hoher Gewinn (kurzfristig)' },
+  { id: 'wr-u06', deck: 'rb', grp: 'bez', term: 'Komplementäre Ziele', def: 'Die Verwirklichung des einen fördert das andere.',
+    ex: 'Hoher Umsatz → hoher Gewinn' },
+  { id: 'wr-u07', deck: 'rb', grp: 'bez', term: 'Indifferente Ziele', def: 'Die Verwirklichung des einen hat keinen Einfluss auf das andere.',
+    ex: 'Faire Löhne / Umweltschutz' },
 
   /* ───────────── FORMELN (nur Aufdecken: aus dem Kopf hinschreiben) ───────────── */
   { id: 'wr-f01', deck: 'rf', noMC: true, ql: 'Formel aus dem Kopf', q: 'Gesamtkosten $K(x)$', term: '$K(x) = K_f + k_v \\cdot x$',
