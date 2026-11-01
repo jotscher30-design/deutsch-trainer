@@ -1,24 +1,24 @@
-/* Abi-Trainer – Logik (Deutsch + Physik + Wirtschaft + PuG)
+/* Abi-Trainer – Logik (Deutsch + Physik + Englisch + Religion)
  * Spaced Repetition (vereinfachtes SM-2), Active Recall, Interleaving, Wenn-Dann-Plan.
  * Themen-Status pro Fach: 0 = aus, 1 = normal, 2 = Fokus (neue Karten kommen dreimal so oft).
  * Alles lokal in localStorage – keine Server, keine Accounts.
  */
 (() => {
   const KEY = 'dt_state_v2', OLD_KEY = 'dt_state_v1'; // v1 bleibt als Sicherung unangetastet liegen
-  const NEWS = 8;
+  const NEWS = 9;
   const $ = sel => document.querySelector(sel);
   const app = $('#app');
   const tabbar = $('#tabbar');
 
   const SUBJ = {
     de: { id: 'de', name: 'Deutsch', decks: DECKS, cards: CARDS, mc: 0.65, npd: 5, goal: 12 },
-    ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15 },
     // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
-    wr: { id: 'wr', name: 'Wirtschaft', decks: DECKS_WR, cards: CARDS_WR, mc: 0.6, npd: 18, goal: 20, exam: '2026-10-28', examName: 'Ex Kosten & Break-even' },
-    // direct: neue Karten ohne Lern-Ansicht sofort abfragen (Stoff kennt Jonas schon vom Blatt) – eine Runde ≈ 20 Min
-    pol: { id: 'pol', name: 'PuG', decks: DECKS_PG, cards: CARDS_PG, mc: 0, npd: 60, goal: 50, exam: '2026-10-27', examName: 'KA Außenpolitik & Terrorismus', direct: true },
+    ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15, exam: '2026-11-10', examName: 'Ex Plattenkondensator' },
+    // direct: neue Karten ohne Lern-Ansicht sofort abfragen (Vokabeln kennt Jonas vom Blatt); ask = Fragezeile beim Aufdecken
+    en: { id: 'en', name: 'Englisch', decks: DECKS_EN, cards: CARDS_EN, mc: 0, npd: 15, goal: 25, direct: true, ask: 'Auf Englisch?' },
+    rel: { id: 'rel', name: 'Religion', decks: DECKS_REL, cards: CARDS_REL, mc: 0, npd: 6, goal: 12, exam: '2026-11-13', examName: 'Klausur Religion' },
   };
-  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_WR, ...DECKS_PG];
+  const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_EN, ...DECKS_REL];
 
   /* ───────── Hilfen ───────── */
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
@@ -78,12 +78,13 @@
   if (S.mig < 4) { for (const id of ['ps', 'pu', 'pf', 'pz', 'pv']) S.set.ph.decks[id] = 2; S.mig = 4; }
   // 18./19.10.2026: Umstellungen im W-Seminar (Fach seit 23.10. entfernt)
   if (S.mig < 6) S.mig = 6;
-  // 23.10.2026: Wirtschaft ersetzt das W-Seminar – einmal direkt dort starten (Ex 28.10.)
-  if (S.mig < 7) { S.set.cur = 'wr'; S.mig = 7; }
-  // 24.10.2026: PuG neu (KA 27.10.) – einmal direkt dort starten
-  if (S.mig < 8) { S.set.cur = 'pol'; S.mig = 8; }
-  // 24.10.2026: Wirtschaft auf 18 Karten reduziert (Begriffe + Formeln) – alle an einem Tag neu
-  if (S.mig < 9) { S.set.wr.newPerDay = 18; S.set.wr.goal = 20; S.mig = 9; }
+  // 23./24.10.2026: Umstellungen für Wirtschaft und PuG (beide seit 01.11. entfernt)
+  if (S.mig < 9) S.mig = 9;
+  // 01.11.2026: Deutsch nur noch Lyrik (Blätter Amler) – übrige Themen pausieren, Fortschritt bleibt; Start in Englisch
+  if (S.mig < 10) {
+    for (const d of DECKS) S.set.de.decks[d.id] = ['gint', 'lyfb'].includes(d.id) ? 2 : 0;
+    S.set.de.newPerDay = 12; S.set.de.goal = 25; S.set.cur = 'en'; S.mig = 10;
+  }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
@@ -246,7 +247,7 @@
     const presets = ['Wenn ich morgens im Bus sitze', 'Wenn ich das Mathe-Blatt fertig habe', 'Wenn ich abends die Zähne geputzt habe', 'Wenn ich in der Pause aufs Handy schaue'];
     app.innerHTML = `
       <h1>Abi-Trainer</h1>
-      <p class="muted">Deutsch (${CARDS.length} Karten: Stilmittel, Argumentation, Epochen …) und Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …) und Wirtschaft (${CARDS_WR.length} Karten: Kosten, Erlös, Gewinn, Break-even) und PuG (${CARDS_PG.length} Karten: Außenpolitik, Terrorismus). Nach dem Lehrplan der 12.</p>
+      <p class="muted">Deutsch (${enabled('de').length} Karten: Gedichtinterpretation, Lyrik-Begriffe), Physik (${CARDS_PH.length} Karten: Konstanten, Felder, Kondensator …), Englisch (${CARDS_EN.length} Vokabeln aus den Vocab sheets) und Religion (${CARDS_REL.length} Karten: Wer bin ich?). Nach dem Lehrplan der 12.</p>
       <div class="box">
         <p><b>So funktioniert es</b></p>
         <p class="muted">Jeden Tag ein paar Minuten pro Fach. Die App fragt dich ab (nicht du liest nach) und zeigt dir jede Karte genau dann wieder, wenn du sie fast vergessen hättest. Das ist der Unterschied zwischen „vor der Schulaufgabe neu lernen“ und „sitzt“.</p>
@@ -297,9 +298,9 @@
       <div class="row between" style="margin-top:14px"><div><h1>${cur().name} heute</h1><p class="muted">${wd}, ${t.split('-').reverse().join('.')}</p></div>
         <div class="stat" style="min-width:86px"><b>${st}</b><span>Tage in Folge</span></div></div>
       ${dl >= 0 ? `<div class="box exam"><b>${cur().examName}: ${dl === 0 ? 'heute' : dl === 1 ? 'morgen' : `in ${dl} Tagen`}</b><p class="muted small" style="margin:4px 0 0">${dl <= 1 ? 'Nur noch Abruf: fällige Karten, dann einzelne Themen.' : 'Alle Karten sind spätestens am Vortag nochmal dran.'}</p></div>` : ''}
-      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: PuG – Kurzarbeit am 27.10.</b></p>
-        <p class="muted small" style="margin:0 0 6px">${CARDS_PG.length} Karten aus deinen Blurtings: Motive & Faktoren, beide Mindmaps, Grundgesetz, IS-Narrative, Medien, umfassende Sicherheit, OSZE. Nur Aufdecken, keine Lern-Ansicht – eine Runde dauert etwa 20 Minuten. Wiederholen: unten „Einzeln abfragen“ oder „Extra-Runde“.</p>
-        ${k !== 'pol' ? `<button class="btn" data-subj="pol" style="padding:10px">Zu PuG</button>` : ''}
+      ${S.news !== NEWS ? `<div class="box news"><p style="margin:0 0 6px"><b>Neu: Englisch, Religion, Deutsch = Lyrik</b></p>
+        <p class="muted small" style="margin:0 0 6px">Englisch: ${CARDS_EN.length} Vokabeln aus deinen vier Vocab sheets, Deutsch → Englisch, 15 neue pro Tag. Religion: Startkarten für die Klausur am 13.11. Deutsch: nur noch Gedichtinterpretation und Lyrik-Begriffe aus den Lyrik-Blättern auf ByCS, 12 neue pro Tag. PuG und Wirtschaft sind raus.</p>
+        ${k !== 'en' ? `<button class="btn" data-subj="en" style="padding:10px">Zu Englisch</button>` : ''}
         <button class="btn ghost" id="newsok" style="padding:10px">Verstanden</button></div>` : ''}
       ${SUBJ[k].decks.some(d => d.seq) ? SUBJ[k].decks.filter(d => d.seq).map(d => `<div class="box checkup"><b>${d.name}</b><p class="muted small" style="margin:4px 0 10px">${SUBJ[k].cards.filter(c => c.deck === d.id).length} Aufgaben fürs Blatt: erst schreiben, dann aufdecken und vergleichen. Gelb = hat beim letzten Mal gefehlt.</p><button class="btn primary" data-checkup="${d.id}">Check-up starten</button></div>`).join('') : ''}
       <div class="box center">
@@ -391,7 +392,7 @@
     } else { // flash: erst im Kopf antworten, dann aufdecken und selbst bewerten
       const prompt = card.q ? `<div class="qtext">${rich(card.q)}</div>` : `<div class="big">${rich(card.term)}</div>`;
       // ql gilt beim Aufdecken nur für Frage-Karten und reine Aufdeck-Karten – sonst passt die MC-Frage nicht zum gezeigten Begriff
-      const askLine = (card.q || card.noMC) && card.ql ? card.ql : card.q ? 'Antwort?' : card.deck === 'stil' ? 'Definition + Beispiel + Wirkung?' : 'Was bedeutet das?';
+      const askLine = (card.q || card.noMC) && card.ql ? card.ql : card.q ? SUBJ[subjOf(card)].ask || 'Antwort?' : card.deck === 'stil' ? 'Definition + Beispiel + Wirkung?' : 'Was bedeutet das?';
       app.innerHTML = head + `
         <div class="qcard" id="qc"><div class="q">${esc(askLine)} ${tag}</div>
           ${prompt}
@@ -451,7 +452,7 @@
   function renderLex() {
     const k = K(), cs = cur().cards;
     app.innerHTML = `${subjSwitch(false)}<h1 style="margin-top:14px">Lexikon</h1><p class="muted">Alle ${cs.length} ${cur().name}-Karten zum Nachschlagen – auch vor der Klausur.</p>
-      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'wr' ? 'Suchen … (z. B. Fixkosten, Break-even, Stückkosten)' : k === 'pol' ? 'Suchen … (z. B. OSZE, Grundgesetz, Core Story)' : 'Suchen … (z. B. Chiasmus, Brecht, Faktenargument)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
+      <p><input type="search" id="q" placeholder="${k === 'ph' ? 'Suchen … (z. B. Kapazität, Elektron, Lorentz)' : k === 'en' ? 'Suchen … (z. B. treaty, Verfassung, swing state)' : k === 'rel' ? 'Suchen … (z. B. Generation Z, Shell, BDKJ)' : 'Suchen … (z. B. Enjambement, Sonett, Basissatz)'}" value="${esc(lexQ)}"></p><div id="list"></div>`;
     const list = $('#list');
     const hay = c => [c.term, c.q, c.def, c.ex, (c.exs || []).join(' '), c.fx].join(' ').toLowerCase();
     const draw = () => {
@@ -521,7 +522,7 @@
         <button class="btn" id="exp">Fortschritt exportieren</button>
         <button class="btn" id="impBtn">Fortschritt importieren</button><input type="file" id="imp" accept="application/json" style="display:none">
         <button class="btn ghost" id="reset" style="color:var(--bad)">Fortschritt zurücksetzen</button></div>
-      <p class="muted small center">Abi-Trainer · Deutsch ${CARDS.length} + Physik ${CARDS_PH.length} + Wirtschaft ${CARDS_WR.length} + PuG ${CARDS_PG.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
+      <p class="muted small center">Abi-Trainer · Deutsch ${enabled('de').length} + Physik ${CARDS_PH.length} + Englisch ${CARDS_EN.length} + Religion ${CARDS_REL.length} Karten · Lehrplan Bayern 12/13 · Spaced Repetition (SM-2)</p>`;
     $('#npd').onclick = e => { const b = e.target.closest('button'); if (b) { c.newPerDay = +b.dataset.v; save(); render(); } };
     $('#goal').onclick = e => { const b = e.target.closest('button'); if (b) { c.goal = +b.dataset.v; save(); render(); } };
     $('#decks').onclick = e => {
