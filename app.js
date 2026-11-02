@@ -91,6 +91,14 @@
     for (const d of DECKS_PH) S.set.ph.decks[d.id] = ['xs', 'xv', 'xf', 'xh'].includes(d.id) ? 2 : 0;
     S.set.ph.newPerDay = 10; S.mig = 11;
   }
+  // 02.11.2026: Religion-Klausur 13.11. (Lernplan-Doc, Tab „Religion-Klausur 13.11.“). Eigener Zähler `migRel` statt `mig`,
+  // damit sie unabhängig von der Physik-Migration läuft (sonst würde ein höheres `mig` die andere überspringen).
+  // Hurrelmann (14 BE) + Menschenbild (16 BE) auf Fokus, Rest normal. Bis Fr 6.11. in Rom nur 5 Min/Tag (5 neue Karten), danach 12.
+  if ((S.migRel || 0) < 1) {
+    for (const d of DECKS_REL) S.set.rel.decks[d.id] = ['rl_hur', 'rl_mb'].includes(d.id) ? 2 : 1;
+    S.set.rel.newPerDay = 5; S.migRel = 1;
+  }
+  if (S.migRel < 2 && today() >= '2026-11-07') { if (S.set.rel.newPerDay === 5) S.set.rel.newPerDay = 12; S.migRel = 2; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
