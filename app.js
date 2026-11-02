@@ -85,6 +85,12 @@
     for (const d of DECKS) S.set.de.decks[d.id] = ['gint', 'lyfb'].includes(d.id) ? 2 : 0;
     S.set.de.newPerDay = 12; S.set.de.goal = 25; S.set.cur = 'en'; S.mig = 10;
   }
+  // 02.11.2026: Physik nur noch Ex-Stoff (Lernplan-Doc, Tab „Physik-Ex 10.11.“) – übrige Themen pausieren, Fortschritt bleibt.
+  // 50 neue Karten, 10 pro Tag → bis Fr 6.11. ist alles einmal dran, Sa 7.11. (Probe-Ex) bleibt Puffer.
+  if (S.mig < 11) {
+    for (const d of DECKS_PH) S.set.ph.decks[d.id] = ['xs', 'xv', 'xf', 'xh'].includes(d.id) ? 2 : 0;
+    S.set.ph.newPerDay = 10; S.mig = 11;
+  }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });

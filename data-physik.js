@@ -9,11 +9,16 @@
  * Mehrzeilige Antworten: Zeilen mit L(…) verbinden – eine Regel pro Zeile.
  */
 const DECKS_PH = [
-  { id: 'ps', name: 'Formelzeichen + Einheit', short: 'Formelzeichen', color: '#2b8a3e', q: 'Frage', def: 2 },
-  { id: 'pu', name: 'Einheiten', short: 'Einheiten', color: '#0b7285', q: 'Frage', def: 2 },
-  { id: 'pf', name: 'Meine Formeln (Übersicht E-Feld)', short: 'Meine Formeln', color: '#d6336c', q: 'Frage', def: 2 },
-  { id: 'pz', name: 'Gültige Ziffern', short: 'Gültige Ziffern', color: '#e67700', q: 'Frage', def: 2 },
-  { id: 'pv', name: 'Grundeinheiten umrechnen', short: 'Umrechnen', color: '#5c940d', q: 'Frage', def: 2 },
+  // Ex 10.11.2026 (Plattenkondensator): genau die Symbol- und Formelübersicht aus dem Lernplan-Doc, Tab „Physik-Ex 10.11.“
+  { id: 'xs', name: 'Ex: Symbole', short: 'Ex: Symbole', color: '#2b8a3e', q: 'Frage', def: 2 },
+  { id: 'xv', name: 'Ex: Vorsilben + Umrechnen', short: 'Ex: Vorsilben', color: '#0b7285', q: 'Frage', def: 2 },
+  { id: 'xf', name: 'Ex: Formeln', short: 'Ex: Formeln', color: '#d6336c', q: 'Frage', def: 2 },
+  { id: 'xh', name: 'Ex: Herleitungen', short: 'Ex: Herleitungen', color: '#5f3dc4', q: 'Frage', def: 2 },
+  { id: 'ps', name: 'Formelzeichen + Einheit', short: 'Formelzeichen', color: '#2b8a3e', q: 'Frage', def: 0 },
+  { id: 'pu', name: 'Einheiten', short: 'Einheiten', color: '#0b7285', q: 'Frage', def: 0 },
+  { id: 'pf', name: 'Meine Formeln (Übersicht E-Feld)', short: 'Meine Formeln', color: '#d6336c', q: 'Frage', def: 0 },
+  { id: 'pz', name: 'Gültige Ziffern', short: 'Gültige Ziffern', color: '#e67700', q: 'Frage', def: 0 },
+  { id: 'pv', name: 'Grundeinheiten umrechnen', short: 'Umrechnen', color: '#5c940d', q: 'Frage', def: 0 },
   { id: 'pk', name: 'Konstanten & Größenordnungen',     short: 'Konstanten', color: '#c92a2a', q: 'Wert?', def: 0 },
   { id: 'pe', name: 'Elektrisches Feld',                short: 'E-Feld',     color: '#1971c2', q: 'Frage', def: 0 },
   { id: 'pc', name: 'Kondensator',                      short: 'Kondensator', color: '#0c8599', q: 'Frage', def: 0 },
@@ -348,8 +353,128 @@ const CARDS_PH = (() => {
       } },
   ];
 
+  /* ───────────── EX 10.11.2026: SYMBOLE (Symboltabelle + „Weitere Zeichen“ im Lernplan) ─────────────
+   * Eine Karte pro Zeichen. Falsche Antworten bevorzugt aus den Verwechslungs-Paaren (cf). */
+  const XSYM = [
+    { k:'Q',    z:T`Q`,               n:'Ladung',                           u:T`\mathrm{C} = \mathrm{As}`, b:'Ladung auf EINER Platte.', cf:['q','C','e'] },
+    { k:'q',    z:T`q`,               n:'Probeladung',                      u:T`\mathrm{C}`, b:'Kleine Ladung, die im Feld bewegt wird.', cf:['Q','e','F'] },
+    { k:'U',    z:T`U`,               n:'Spannung',                         u:T`\mathrm{V}`, b:'Zwischen den Platten.', cf:['phi','W','V'] },
+    { k:'d',    z:T`d`,               n:'Plattenabstand',                   u:T`\mathrm{m}`, b:'Nicht mit dem Durchmesser verwechseln!', cf:['r','x','A'] },
+    { k:'A',    z:T`A`,               n:'Plattenfläche',                    u:T`\mathrm{m^2}`, b:T`Kreisplatte: $A = \pi \cdot r^2$.`, cf:['C','V','d'] },
+    { k:'r',    z:T`r`,               n:'Radius',                           u:T`\mathrm{m}`, b:T`$r = \dfrac{\text{Durchmesser}}{2}$`, cf:['d','x','A'] },
+    { k:'C',    z:T`C`,               n:'Kapazität',                        u:T`\mathrm{F} = \dfrac{\mathrm{C}}{\mathrm{V}}`, b:'Wie viel Ladung pro Volt draufpasst.', cf:['Q','A','F'] },
+    { k:'eps0', z:T`\varepsilon_0`,   n:'elektrische Feldkonstante',        u:T`\dfrac{\mathrm{As}}{\mathrm{Vm}}`, b:T`$\varepsilon_0 = 8{,}8542 \cdot 10^{-12}\,\dfrac{\mathrm{As}}{\mathrm{Vm}}$, steht in der Formelsammlung.`, cf:['epsr','e','E'] },
+    { k:'epsr', z:T`\varepsilon_r`,   n:'Dielektrizitätszahl',              u:'', b:'Luft = 1 (nicht 0!), Glas ca. 5 bis 10.', cf:['eps0','n','E'] },
+    { k:'E',    z:T`E`,               n:'Feldstärke',                       u:T`\dfrac{\mathrm{V}}{\mathrm{m}} = \dfrac{\mathrm{N}}{\mathrm{C}}`, b:'Kraft pro Probeladung.', cf:['Wel','F','U'] },
+    { k:'Wel',  z:T`W_\text{el}`,     n:'Energie im Kondensator',           u:T`\mathrm{J}`, b:'So schreibt es das Buch. Im Heft steht nur „E“ – das verwechselst du mit der Feldstärke.', cf:['E','W','F'] },
+    { k:'W',    z:T`W`,               n:'Arbeit',                           u:T`\mathrm{J}`, b:'Arbeit an der Probeladung q.', cf:['Wel','U','F'] },
+    { k:'F',    z:T`F`,               n:'Kraft',                            u:T`\mathrm{N}`, b:'Auf q im Feld.', cf:['E','W','g'] },
+    { k:'phi',  z:T`\varphi`,         n:'Potenzial',                        u:T`\mathrm{V}`, b:'Energie pro Ladung an einem Punkt.', cf:['U','Wel','E'] },
+    { k:'m',    z:T`m`,               n:'Masse',                            u:T`\mathrm{kg}`, b:'Beim Schweben.', cf:['g','q','V'] },
+    { k:'g',    z:T`g`,               n:'Fallbeschleunigung',               u:T`\dfrac{\mathrm{N}}{\mathrm{kg}}`, b:T`$g = 9{,}81\,\dfrac{\mathrm{N}}{\mathrm{kg}}$.`, cf:['E','m','F'] },
+    { k:'e',    z:T`e`,               n:'Elementarladung',                  u:T`\mathrm{C}`, b:T`$e = 1{,}602 \cdot 10^{-19}\,\mathrm{C}$.`, cf:['E','q','Q'] },
+    { k:'n',    z:T`n`,               n:'Anzahl der Elementarladungen',     u:'', b:T`$n = \dfrac{q}{e}$, z. B. beim Öltröpfchen.`, cf:['e','Q','I'] },
+    { k:'x',    z:T`x`,               n:'Abstand von der negativen Platte', u:T`\mathrm{m}`, b:T`Für das Potenzial $\varphi = E \cdot x$.`, cf:['d','r','t'] },
+    { k:'I',    z:T`I`,               n:'Stromstärke',                      u:T`\mathrm{A}`, b:'Beim Auf- und Entladen.', cf:['U','Q','t'] },
+    { k:'t',    z:T`t`,               n:'Zeit',                             u:T`\mathrm{s}`, b:'Beim Auf- und Entladen.', cf:['I','x','R'] },
+    { k:'R',    z:T`R`,               n:'Widerstand',                       u:T`\Omega`, b:'Bestimmt die Ladedauer mit: größeres R, längeres Laden.', cf:['U','I','C'] },
+    { k:'V',    z:T`V`,               n:'Volumen',                          u:T`\mathrm{m^3}`, b:T`Raum zwischen den Platten, $V = A \cdot d$. Nicht mit Volt verwechseln!`, cf:['U','A','W'] },
+  ];
+  const XSY = Object.fromEntries(XSYM.map(s => [s.k, s]));
+  const xName = x => `${x.n} · ${x.u ? `$${x.u}$` : 'ohne Einheit'}`;
+  const xWrong = s => {
+    const out = [], seen = new Set([xName(s)]);
+    for (const k of [...s.cf, ...XSYM.map(x => x.k).sort(() => Math.random() - 0.5)]) {
+      const v = xName(XSY[k]); if (k !== s.k && !seen.has(v)) { seen.add(v); out.push(v); } if (out.length === 3) break;
+    }
+    return out;
+  };
+  const XSYMCARDS = XSYM.map(s => ({ id:`ph-ex-s-${s.k}`, deck:'xs', ql:'Zeichen → Name + Einheit', q:`Wofür steht $${s.z}$ – und welche Einheit?`, term:xName(s),
+    get wrong() { return xWrong(s); }, def:s.b }));
+
+  /* ───────────── EX: VORSILBEN + UMRECHNEN (Tabelle „Vorsilben“) ───────────── */
+  const XPRE = [
+    { k:'p',   q:'Vorsilbe p (piko): mit welchem Faktor ersetzt du sie?', f:-12, bad:[-9, -15, -6], def:T`$560\,\mathrm{pF} = 5{,}60 \cdot 10^{-10}\,\mathrm{F}$` },
+    { k:'n',   q:'Vorsilbe n (nano): mit welchem Faktor ersetzt du sie?', f:-9, bad:[-12, -6, -8], def:T`$2{,}0\,\mathrm{nF} = 2{,}0 \cdot 10^{-9}\,\mathrm{F}$` },
+    { k:'mu',  q:'Vorsilbe µ (mikro): mit welchem Faktor ersetzt du sie?', f:-6, bad:[-9, -3, -5], def:T`$47\,\mathrm{\mu F} = 4{,}7 \cdot 10^{-5}\,\mathrm{F}$` },
+    { k:'m',   q:'Vorsilbe m (milli): mit welchem Faktor ersetzt du sie?', f:-3, bad:[-6, -2, 3], def:T`$350\,\mathrm{mJ} = 0{,}350\,\mathrm{J}$ (Grenze Buch S. 15)` },
+    { k:'k',   q:'Vorsilbe k (kilo): mit welchem Faktor ersetzt du sie?', f:3, bad:[-3, 6, 2], def:T`$2{,}0\,\mathrm{kV} = 2{,}0 \cdot 10^{3}\,\mathrm{V}$` },
+    { k:'cm',  q:'Von cm nach m: mit welchem Faktor malnehmen?', f:-2, bad:[-4, -3, 2], def:T`$15\,\mathrm{cm} = 0{,}15\,\mathrm{m}$` },
+    { k:'cm2', q:'Von cm² nach m²: mit welchem Faktor malnehmen?', f:-4, bad:[-2, -6, -8], def:T`$400\,\mathrm{cm^2} = 4{,}00 \cdot 10^{-2}\,\mathrm{m^2}$. Grund: $(10^{-2})^2 = 10^{-4}$.` },
+    { k:'mm',  q:'Von mm nach m: mit welchem Faktor malnehmen?', f:-3, bad:[-2, -6, -4], def:T`$3{,}0\,\mathrm{mm} = 3{,}0 \cdot 10^{-3}\,\mathrm{m}$` },
+  ];
+  const XPRECARDS = XPRE.map(x => ({ id:`ph-ex-v-${x.k}`, deck:'xv', ql:'Faktor', q:x.q, term:`$10^{${x.f}}$`, wrong:x.bad.map(b => `$10^{${b}}$`), def:x.def }));
+
+  /* ───────────── EX: FORMELN (Formelübersicht Plattenkondensator) ───────────── */
+  const XFORM = [
+    { k:'CQU',  w:'die Kapazität aus Ladung und Spannung', f:T`C = \dfrac{Q}{U}`,
+      bad:[T`C = Q \cdot U`, T`C = \dfrac{U}{Q}`, T`C = \dfrac{Q}{d}`],
+      def:L(T`Brauchst du: fast immer, wenn nach Q gefragt ist (umgestellt $Q = C \cdot U$).`, 'Woher: Versuch – Q ist proportional zu U (Messtabelle im Heft).') },
+    { k:'CAd',  w:'die Kapazität aus der Bauform', f:T`C = \varepsilon_0 \cdot \varepsilon_r \cdot \dfrac{A}{d}`,
+      bad:[T`C = \varepsilon_0 \cdot \varepsilon_r \cdot \dfrac{d}{A}`, T`C = \varepsilon_0 \cdot \varepsilon_r \cdot A \cdot d`, T`C = \dfrac{A}{\varepsilon_0 \cdot \varepsilon_r \cdot d}`],
+      def:L('Brauchst du: wenn Fläche und Abstand gegeben sind.', 'Woher: Versuch – C wächst mit A und sinkt mit d.'), fx:T`Luft: $\varepsilon_r = 1$, nicht 0.` },
+    { k:'EUd',  w:'die Feldstärke zwischen den Platten', f:T`E = \dfrac{U}{d}`,
+      bad:[T`E = U \cdot d`, T`E = \dfrac{d}{U}`, T`E = \dfrac{U}{q}`],
+      def:L('Brauchst du: bei Kraft auf Ladungen und beim Schweben.', 'Woher: gilt nur im homogenen Feld, also im Plattenkondensator.') },
+    { k:'FqE',  w:'die Kraft auf eine Ladung im Feld', f:T`F = q \cdot E`,
+      bad:[T`F = \dfrac{q}{E}`, T`F = \dfrac{E}{q}`, T`F = q \cdot U`],
+      def:L('Brauchst du: Schweben, Pendel, Öltröpfchen.', T`Woher: Definition der Feldstärke $E = \dfrac{F}{q}$.`) },
+    { k:'WqU',  w:'die Arbeit, um q von einer Platte zur anderen zu bringen', f:T`W = q \cdot U`,
+      bad:[T`W = \dfrac{q}{U}`, T`W = q \cdot E`, T`W = \dfrac{U}{q}`],
+      def:L('Brauchst du: Energie einer Probeladung.', T`Woher: Definition der Spannung $U = \dfrac{W}{q}$.`) },
+    { k:'Wel',  w:'die im Kondensator gespeicherte Energie (alle drei Formen)', f:T`W_\text{el} = \dfrac{1}{2} Q U = \dfrac{1}{2} C U^2 = \dfrac{1}{2} \dfrac{Q^2}{C}`,
+      bad:[T`W_\text{el} = Q U = C U^2 = \dfrac{Q^2}{C}`, T`W_\text{el} = \dfrac{1}{2} Q U = \dfrac{1}{2} C U = \dfrac{1}{2} \dfrac{Q^2}{C}`, T`W_\text{el} = \dfrac{1}{2} Q U = \dfrac{1}{2} C U^2 = \dfrac{1}{2} \dfrac{C}{Q^2}`],
+      def:L('Brauchst du: Energieaufgaben, Gefahr beurteilen.', 'Woher: Herleitung über das U-Q-Diagramm (siehe Herleitungen).'), fx:'U steht im Quadrat: doppelte Spannung, vierfache Energie.' },
+    { k:'Cpar', w:'die Gesamtkapazität bei Parallelschaltung', f:T`C = C_1 + C_2`,
+      bad:[T`\dfrac{1}{C} = \dfrac{1}{C_1} + \dfrac{1}{C_2}`, T`C = C_1 \cdot C_2`, T`C = \dfrac{C_1 + C_2}{2}`],
+      def:L('Brauchst du: zwei Kondensatoren nebeneinander an derselben Spannung.', 'Woher: gleiches U, die Ladungen addieren sich.') },
+    { k:'Crei', w:'die Gesamtkapazität bei Reihenschaltung', f:T`\dfrac{1}{C} = \dfrac{1}{C_1} + \dfrac{1}{C_2}`,
+      bad:[T`C = C_1 + C_2`, T`C = \dfrac{1}{C_1} + \dfrac{1}{C_2}`, T`\dfrac{1}{C} = C_1 + C_2`],
+      def:L('Brauchst du: zwei Kondensatoren hintereinander.', 'Woher: gleiches Q, die Spannungen addieren sich.'), fx:'In Reihe ist C kleiner als der kleinste Einzelkondensator.' },
+    { k:'WelV', w:'die Energie im Kondensator aus Volumen und Feldstärke', f:T`W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot V \cdot E^2`,
+      bad:[T`W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot V \cdot E`, T`W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot A \cdot E^2`, T`W_\text{el} = \varepsilon_0 \cdot \varepsilon_r \cdot V \cdot E^2`],
+      def:L('Brauchst du: wenn sich d ändert und E gleich bleibt (Buch S. 71/5).', 'Woher: Herleitung Merkzettel S. 70.') },
+    { k:'Fpl',  w:'die Kraft, mit der sich die Platten anziehen', f:T`F = \dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot E^2`,
+      bad:[T`F = \dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot E`, T`F = \dfrac{1}{2} \cdot \varepsilon_0 \cdot V \cdot E^2`, T`F = \varepsilon_0 \cdot A \cdot E^2`],
+      def:L('Brauchst du: Buch S. 71/5 e).', T`Woher: Zunahme der Energie = Arbeit $F \cdot \Delta d$.`), fx:T`Gilt für Luft, darum ohne $\varepsilon_r$.` },
+    { k:'qEmg', w:'die Bedingung fürs Schweben einer Ladung im Feld', f:T`q \cdot E = m \cdot g`,
+      bad:[T`q \cdot U = m \cdot g`, T`\dfrac{q}{E} = m \cdot g`, T`q \cdot E = \dfrac{m}{g}`],
+      def:L('Brauchst du: Schwebendes Gold, Öltröpfchen, Staubteilchen.', T`Woher: Kräftegleichgewicht $F_\text{el} = F_\text{G}$. Mit $E = \dfrac{U}{d}$ wird daraus $q = \dfrac{m \cdot g \cdot d}{U}$.`) },
+    { k:'phiEx',w:'das Potenzial im Abstand x von der negativen Platte', f:T`\varphi = E \cdot x`,
+      bad:[T`\varphi = \dfrac{E}{x}`, T`\varphi = U \cdot x`, T`\varphi = q \cdot E \cdot x`],
+      def:L('Brauchst du: Potenzial-Aufgaben im Plattenkondensator.', T`Woher: negative Platte hat $\varphi = 0$, im homogenen Feld wächst $\varphi$ gleichmäßig.`) },
+    { k:'QIt',  w:'die transportierte Ladung bei konstantem Strom', f:T`\Delta Q = I \cdot \Delta t`,
+      bad:[T`\Delta Q = \dfrac{I}{\Delta t}`, T`\Delta Q = \dfrac{\Delta t}{I}`, T`\Delta Q = U \cdot \Delta t`],
+      def:L('Brauchst du: Auf- und Entladen, Akku-Angaben in mAh.', 'Woher: Definition der Stromstärke; sonst Fläche unter der I-t-Kurve.'),
+      fx:T`$2000\,\mathrm{mAh} = 2{,}000\,\mathrm{A} \cdot 3600\,\mathrm{s} = 7200\,\mathrm{C}$` },
+  ];
+  const XFORMCARDS = XFORM.map(x => ({ id:`ph-ex-f-${x.k}`, deck:'xf', ql:'Formel', q:`Formel für ${x.w}`, term:`$${x.f}$`, wrong:x.bad.map(b => `$${b}$`), def:x.def, fx:x.fx }));
+
+  /* ───────────── EX: HERLEITUNGEN (nur Aufdecken) ─────────────
+   * Formeln, die nicht in der Formelsammlung stehen; der Lehrer hat „Herleiten der anderen Formeln für Energie“ angekündigt. */
+  const XDERCARDS = [
+    { id:'ph-ex-h1', deck:'xh', noMC:true, ql:'Herleitung', q:T`Leite $W_\text{el} = \dfrac{1}{2} \cdot Q \cdot U$ her.`,
+      term:L(T`Beim Laden wächst $U$ proportional zu $Q$:`, T`$ {Q = C \cdot U}$`, 'Im U-Q-Diagramm (Q nach rechts, U nach oben) ist das eine Ursprungsgerade.', T`Jede kleine Ladungsportion $\Delta Q$ braucht die Arbeit $\Delta W = U \cdot \Delta Q$ (wie $W = q \cdot U$) – ein schmaler Streifen unter der Geraden.`, 'Alle Streifen zusammen: Die Ladearbeit ist die Fläche unter der Geraden – ein Dreieck.', 'Dreiecksfläche:', T`$ {W_\text{el} = \dfrac{1}{2} \cdot Q \cdot U}$`),
+      def:'Mit Skizze des Diagramms aufschreiben.' },
+    { id:'ph-ex-h2', deck:'xh', noMC:true, ql:'Herleitung', q:T`Forme $W_\text{el} = \dfrac{1}{2} \cdot Q \cdot U$ in die beiden anderen Energieformeln um.`,
+      term:L(T`$Q = C \cdot U$ einsetzen:`, T`$ {W_\text{el} = \dfrac{1}{2} \cdot C \cdot U^2}$`, T`$U = \dfrac{Q}{C}$ einsetzen:`, T`$ {W_\text{el} = \dfrac{1}{2} \cdot \dfrac{Q^2}{C}}$`) },
+    { id:'ph-ex-h3', deck:'xh', noMC:true, ql:'Herleitung', q:T`Leite $W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot V \cdot E^2$ her.`,
+      term:L('Start:', T`$ {W_\text{el} = \dfrac{1}{2} \cdot C \cdot U^2}$`, T`Einsetzen: $C = \varepsilon_0 \cdot \varepsilon_r \cdot \dfrac{A}{d}$ und $U = E \cdot d$`, T`$ {W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot \dfrac{A}{d} \cdot E^2 \cdot d^2}$`, T`$ {= \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot A \cdot d \cdot E^2}$`, T`Mit $A \cdot d = V$:`, T`$ {W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot \varepsilon_r \cdot V \cdot E^2}$`),
+      def:'Buch-Merkzettel S. 70. Bei gleicher Feldstärke steckt umso mehr Energie im Kondensator, je größer das Volumen ist.' },
+    { id:'ph-ex-h4', deck:'xh', noMC:true, ql:'Herleitung', q:T`Leite $F = \dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot E^2$ her (Quelle abgetrennt, Platten werden auseinandergezogen).`,
+      term:L(T`Q bleibt gleich. $E = \dfrac{Q}{\varepsilon_0 \cdot A}$ hängt nicht von $d$ ab, also bleibt E gleich.`, T`$ {W_\text{el} = \dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot d \cdot E^2}$ wächst darum nur über $d$.`, T`$d$ wird um $\Delta d$ größer. Dann wächst $W_\text{el}$ um:`, T`$ {\dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot E^2 \cdot \Delta d}$`, T`Diese Zunahme ist die Arbeit $F \cdot \Delta d$. Also:`, T`$ {F = \dfrac{1}{2} \cdot \varepsilon_0 \cdot A \cdot E^2}$`),
+      def:T`Buch S. 71/5 e). Luft, also ohne $\varepsilon_r$.` },
+    { id:'ph-ex-h5', deck:'xh', noMC:true, ql:'Herleitung', q:T`Begründe $C = C_1 + C_2$ für die Parallelschaltung.`,
+      term:L(T`Beide Kondensatoren haben dieselbe Spannung $U$.`, 'Die Ladungen addieren sich:', T`$ {Q = Q_1 + Q_2 = C_1 \cdot U + C_2 \cdot U}$`, T`Durch $U$ teilen:`, T`$ {C = C_1 + C_2}$`),
+      def:T`Bild (Buch S. 71/6): Die Plattenflächen addieren sich, $A_1 + A_2$.` },
+    { id:'ph-ex-h6', deck:'xh', noMC:true, ql:'Herleitung', q:T`Begründe $\dfrac{1}{C} = \dfrac{1}{C_1} + \dfrac{1}{C_2}$ für die Reihenschaltung.`,
+      term:L(T`Beide tragen dieselbe Ladung $Q$.`, 'Die Spannungen addieren sich:', T`$ {U = U_1 + U_2 = \dfrac{Q}{C_1} + \dfrac{Q}{C_2}}$`, T`Durch $Q$ teilen:`, T`$ {\dfrac{1}{C} = \dfrac{1}{C_1} + \dfrac{1}{C_2}}$`),
+      def:T`Bild (Buch S. 71/6): Die Abstände addieren sich, $d_1 + d_2$.` },
+  ];
+  const EXCARDS = [...XSYMCARDS, ...XPRECARDS, ...XFORMCARDS, ...XDERCARDS];
+
   return [
-    ...SYMCARDS, ...UNITCARDS, ...FORMCARDS, ...SIGCARDS, ...CONVCARDS,
+    ...EXCARDS, ...SYMCARDS, ...UNITCARDS, ...FORMCARDS, ...SIGCARDS, ...CONVCARDS,
     /* ───────────── KONSTANTEN & GRÖSSENORDNUNGEN ───────────── */
     { id:'ph-k01', deck:'pk', q:T`Elementarladung $e$`, term:T`$e = 1{,}602 \cdot 10^{-19}\,\mathrm{C}$`,
       wrong:[T`$e = 1{,}602 \cdot 10^{-31}\,\mathrm{C}$`, T`$e = 9{,}11 \cdot 10^{-19}\,\mathrm{C}$`, T`$e = 1{,}602 \cdot 10^{19}\,\mathrm{C}$`, T`$e = 6{,}24 \cdot 10^{-18}\,\mathrm{C}$`],
