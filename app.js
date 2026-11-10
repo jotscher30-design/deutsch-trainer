@@ -99,6 +99,8 @@
     S.set.rel.newPerDay = 5; S.migRel = 1;
   }
   if (S.migRel < 2 && today() >= '2026-11-07') { if (S.set.rel.newPerDay === 5) S.set.rel.newPerDay = 12; S.migRel = 2; }
+  // 10.11.2026: Wiederholung der mündlichen Abfrage als Check-up-Deck (manuell, feste Reihenfolge) – sichtbar schalten
+  if (S.migRel < 3) { S.set.rel.decks.rl_wdh = 2; S.migRel = 3; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
