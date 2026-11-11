@@ -103,6 +103,8 @@
   if (S.migRel < 3) { S.set.rel.decks.rl_wdh = 2; S.migRel = 3; }
   // 11.11.2026: Check-up-Deck „Klausur-Basics“ (Aufbau je Aufgabentyp der Musterklausur) sichtbar schalten
   if (S.migRel < 4) { S.set.rel.decks.rl_kb = 2; S.migRel = 4; }
+  // 11.11.2026: Check-up-Deck „Textbausteine“ (auswendig lernbare Formulierungen je Aufgabe) sichtbar schalten
+  if (S.migRel < 5) { S.set.rel.decks.rl_tb = 2; S.migRel = 5; }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
   save();
   const H = (day, k = K()) => (S.hist[k][day] = S.hist[k][day] || { r: 0, c: 0, n: 0 });
