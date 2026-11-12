@@ -16,7 +16,7 @@ const DECKS_REL = [
   { id: 'rl_sex', name: 'Geschlecht', short: 'Geschlecht', color: '#5f3dc4', q: 'Welcher Begriff?', def: 1 },
   { id: 'rl_wdh', name: 'Wiederholung Abfrage 10.11. (15 Fragen)', short: 'Wdh. 10.11.', color: '#c92a2a', q: 'Antwort?', def: 2, manual: true, seq: true },
   { id: 'rl_kb', name: 'Klausur-Basics: jede Aufgabe richtig angehen (15 Fragen)', short: 'Klausur-Basics', color: '#2b8a3e', q: 'Antwort?', def: 2, manual: true, seq: true },
-  { id: 'rl_tb', name: 'Textbausteine zum Auswendiglernen (23 Bausteine, ⭐ = wörtlich)', short: 'Textbausteine', color: '#e67700', q: 'Sag den Baustein auf', def: 2, manual: true, seq: true },
+  { id: 'rl_tb', name: 'Textbausteine zum Auswendiglernen (25 Bausteine, ⭐ = wörtlich)', short: 'Textbausteine', color: '#e67700', q: 'Sag den Baustein auf', def: 2, manual: true, seq: true },
   { id: 'rl_kl', name: 'Klausur', short: 'Klausur', color: '#495057', q: 'Welcher Begriff?', def: 1 },
 ];
 
@@ -275,6 +275,9 @@ const CARDS_REL = [
     fx: 'Non-binär = Geschlechtsidentität, nicht sexuelle Orientierung.' },
   { id: 'rel-tb04', deck: 'rl_tb', noMC: true, q: 'Baustein Aufgabe 1 · Rolle und Entwicklungsaufgabe', term: '„Eine Rolle beschreibt die Erwartungen, die an eine bestimmte soziale Position gerichtet sind, zum Beispiel an einen Sohn oder eine Schülerin. Eine Entwicklungsaufgabe nach Hurrelmann beschreibt dagegen einen Entwicklungsschritt, den die Gesellschaft von einem Menschen in einer bestimmten Altersphase erwartet. Rollen wechseln je nach Situation, Entwicklungsaufgaben hängen am Lebensalter.“',
     def: 'Falls Aufgabe 1 diese beiden Begriffe gegeneinander abgrenzen lässt.' },
+  { id: 'rel-tb24', deck: 'rl_tb', noMC: true, q: '⭐ Baustein Aufgabe 1 · Generation und Identität', term: '„Identität (lat. idem = ‚derselbe‘) bezeichnet das eigene Selbst eines einzelnen Menschen, fast gleichbedeutend mit Persönlichkeit. Eine Generation dagegen ist eine Gruppe von Menschen ähnlicher Jahrgänge, die in ihrer Jugend dieselben prägenden Ereignisse erlebt haben und daraus ein gemeinsames Bewusstsein entwickeln. Identität ist also individuell, Generation kollektiv. Beide hängen zusammen: Die Prägung der eigenen Generation, etwa der Generation Z durch Digitalisierung und Klimakrise, fließt in die Identität des Einzelnen ein, bestimmt sie aber nicht vollständig.“',
+    def: 'Laut Lehrer-Schwerpunkten sind „Identität und Generation“ die beiden Begriffe – diese Abgrenzung ist darum besonders wahrscheinlich.',
+    fx: 'Gerüst: individuell ↔ kollektiv · Zusammenhang: Prägung fließt ein, bestimmt nicht alles.' },
   { id: 'rel-tb05', deck: 'rl_tb', noMC: true, q: '⭐ Baustein Aufgabe 2a · Gerüst Rolle darstellen (6 BE)', term: '„Der Text … von … thematisiert … . Im Text kommt XY die Rolle als … zu (Z. …). Von XY wird – etwa von den Eltern – erwartet, dass … (Z. …). Zunächst … (Z. …). Im weiteren Verlauf jedoch … (Z. …). Die Rolle von XY wandelt sich also von … zu … .“',
     def: 'Lücken mit Zitaten füllen. Die Rolle mit dem Wort aus dem Text benennen (z. B. „mein Nachfolger“) und sagen, WER die Rollenerwartung hat.',
     fx: 'Nur darstellen, noch nicht bewerten – Hurrelmann und Glaube kommen erst in 2b und 3.' },
@@ -314,6 +317,9 @@ const CARDS_REL = [
     fx: 'Das ist auch das „L“ aus W-G-L-A.' },
   { id: 'rel-tb18', deck: 'rl_tb', noMC: true, q: 'Baustein Aufgabe 3 · Transzendenz und Vollendung', term: '„Der Mensch ist offen für Transzendenz, also für das, was über die Welt hinausgeht: Er fragt über das Alltägliche hinaus nach dem Sinn seines Lebens; der christliche Glaube sieht diesen letzten Sinnbezug in Gott. Christen glauben zudem, dass der Mensch zur Vollendung berufen ist (1 Kor 15). Das irdische Leben ist deshalb nicht die ‚letzte Gelegenheit‘, alles zu erreichen; Scheitern hat nicht das letzte Wort. Für XY heißt das: …“',
     def: 'Passt bei: Sinnleere, „Wofür das alles?“, Angst vor einer falschen Entscheidung.' },
+  { id: 'rel-tb25', deck: 'rl_tb', noMC: true, q: 'Baustein Aufgabe 3 · Verantwortlicher Mitgestalter der Welt', term: '„Der Mensch ist verantwortlicher Mitgestalter der Welt: Er soll sie nach Gen 1,28 und Gen 2,15 (‚bebauen und hüten‘) als Sachwalter in Fürsorge gestalten, nicht nach Willkür. Zugleich bleibt er Geschöpf und nicht Gott: Vor Machbarkeitswahn warnt der Glaube. Eingriffe in Natur und Körper sind bei therapeutischen Zielen und zum Schutz der Person möglich, aber nicht beliebig. Er muss die Welt auch nicht allein retten. Für XY heißt das: …“',
+    def: 'Passt bei: Engagement, Klima, Verantwortung, Überforderung („ich muss alles schaffen“), Eingriffe in den eigenen Körper (dann zusätzlich Würde und Annahme nennen).',
+    fx: 'Bibelstellen sind Bonus.' },
   { id: 'rel-tb19', deck: 'rl_tb', noMC: true, q: 'Baustein Aufgabe 3 · Sünde, Schuld und Vergebung', term: '„Das christliche Menschenbild verschweigt nicht, dass der Mensch Sünder ist und seine Freiheit missbrauchen kann; Sünde meint eine gestörte Beziehung zu Gott. Doch auch Schuld nimmt dem Menschen nicht seine Würde: Gott schenkt Vergebung und die Möglichkeit eines Neuanfangs.“',
     def: 'Nur einsetzen, wenn im Text echte Schuld vorkommt – nicht bei bloßem Misserfolg.' },
   { id: 'rel-tb20', deck: 'rl_tb', noMC: true, q: '⭐ Baustein Aufgabe 3 · Antwort auf den Entscheidungszwang (W-G-L-A)', term: '„Gerade dem Zwang, selbst über den Sinn des eigenen Lebens entscheiden zu müssen, nimmt der christliche Glaube das Erdrückende: Als Ebenbild Gottes hat XY eine unbedingte Würde, als Kind Gottes ist er/sie geborgen und angenommen, aus Gottes Liebe erwächst die Fähigkeit, sich selbst anzunehmen und andere zu lieben, und die Hoffnung auf Auferstehung zeigt, dass keine Entscheidung das letzte Wort hat.“',
