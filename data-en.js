@@ -10,6 +10,7 @@ const DECKS_EN = [
   { id: 'ew', name: 'The world\'s stake in American democracy (20.10.)', short: 'World\'s stake', color: '#5f3dc4', q: 'English?', def: 2 },
   { id: 'ep', name: 'Political systems US & UK (25.09.)', short: 'US & UK', color: '#2f9e44', q: 'English?', def: 1 },
   { id: 'eo', name: 'One dream to unite them all (13.11.)', short: 'One dream', color: '#e8590c', q: 'English?', def: 2 },
+  { id: 'eb', name: 'Mediation-Bausteine (Lernblatt, 3 Min am Morgen)', short: 'Bausteine', color: '#1f4e79', q: 'Auf Englisch, mit Baustein', def: 2, manual: true, seq: true },
 ];
 
 const CARDS_EN = [
@@ -219,4 +220,32 @@ const CARDS_EN = [
   { id: 'en-o19', deck: 'eo', q: 'ein Gleichgewicht schaffen/herstellen', term: 'to strike a balance', def: 'to reach a point where two different things have equal importance', ex: 'It’s important to strike a balance between work life and family life.' },
   { id: 'en-o20', deck: 'eo', q: 'Bewertung', term: 'assessment', ex: 'He took a test at the assessment centre and got the result he needed to apply for university.', fx: 'assessment = evaluation\nassessment → to assess (v)' },
   { id: 'en-o21', deck: 'eo', q: 'Eindruck', term: 'impression', ex: 'During the interview I got the strong impression that the candidate was confident and capable.', fx: 'to make a good/great (first) impression\nto get/have/give sb the impression that\nimpression → to impress (v) → impressive (adj)' },
+
+  /* ───────────── MEDIATION-BAUSTEINE (Lernblatt 15.11.) ─────────────
+     Check-up: jeden Morgen bis zur KA, deutscher Satz → englisch mit dem Baustein laut sagen */
+  { id: 'en-b01', deck: 'eb', noMC: true, q: 'E-Mail locker · Anfang + Anlass: Hi Sam, du hast mich nach einem Highschool-Jahr in den USA gefragt, also hier ist, was ich herausgefunden habe.', term: 'Hi Sam, you asked me about a high school year in the US, so here is what I found out.' },
+  { id: 'en-b02', deck: 'eb', noMC: true, q: 'E-Mail formell · Anlass: Sehr geehrte Frau Smith, ich schreibe Ihnen, um Ihnen einige Informationen zum Wahlsystem der USA zu geben.', term: 'Dear Ms Smith, I am writing to give you some information on the US electoral system.' },
+  { id: 'en-b03', deck: 'eb', noMC: true, q: 'Artikel · Einstieg: Habt ihr euch je gefragt, ob der amerikanische Traum noch lebt?', term: 'Have you ever wondered whether the American Dream is still alive?' },
+  { id: 'en-b04', deck: 'eb', noMC: true, q: 'Quelle: In einem Blogpost mit dem Titel „Leben in den USA“, 2021 veröffentlicht, schreiben die Autorinnen über den Alltag dort.', term: 'In a blog post called ‘Leben in den USA’ (‘Life in the USA’), published in 2021, the authors write about everyday life there.' },
+  { id: 'en-b05', deck: 'eb', noMC: true, q: 'Quelle · Ton: Sie zeichnen ein ausgewogenes Bild vom Arbeitsleben in den USA.', term: 'They give a balanced picture of working life in the US.' },
+  { id: 'en-b06', deck: 'eb', noMC: true, q: 'Absatz starten: Was das Arbeitsleben angeht, ist ein Hochschulabschluss von Vorteil.', term: 'When it comes to working life, a university degree is an advantage.' },
+  { id: 'en-b07', deck: 'eb', noMC: true, q: 'Absatz starten: Was den Umgang mit Menschen betrifft, ist Offenheit unverzichtbar.', term: 'As for getting on with people, it is essential to be open.' },
+  { id: 'en-b08', deck: 'eb', noMC: true, q: 'Wiedergeben: Laut den Autorinnen ist es leichter, ein Visum zu bekommen, wenn man schon einen Job hat.', term: 'According to the authors, it is easier to get a visa if you already have a job.' },
+  { id: 'en-b09', deck: 'eb', noMC: true, q: 'Wiedergeben: Sie weisen darauf hin, dass Urlaub oft unbezahlt ist.', term: 'They point out that holidays are often unpaid.' },
+  { id: 'en-b10', deck: 'eb', noMC: true, q: '⬆ Wiedergeben: Sie betonen, dass Smalltalk Teil der Kultur ist.', term: 'They stress that small talk is part of the culture.' },
+  { id: 'en-b11', deck: 'eb', noMC: true, q: 'Meinung der Quelle: Ihrer Ansicht nach ist Offenheit entscheidend.', term: 'In their view, openness is vital.' },
+  { id: 'en-b12', deck: 'eb', noMC: true, q: 'Hinzufügen: Außerdem haben auch Ältere noch Chancen auf einen Job.', term: 'In addition, older employees still have a chance of finding a job.' },
+  { id: 'en-b13', deck: 'eb', noMC: true, q: '⬆ Hinzufügen: Darüber hinaus ist ein häufiger Jobwechsel dort normaler.', term: 'What is more, changing jobs frequently is more normal there.' },
+  { id: 'en-b14', deck: 'eb', noMC: true, q: 'Gegensatz: Allerdings gibt es weniger soziale Absicherung.', term: 'However, there is less social security.' },
+  { id: 'en-b15', deck: 'eb', noMC: true, q: '⬆ Gegensatz: Obwohl es viele Chancen gibt, ist die soziale Absicherung schlechter.', term: 'Although there are many opportunities, social security is weaker. (kein „but“)' },
+  { id: 'en-b16', deck: 'eb', noMC: true, q: 'Grund: Das liegt daran, dass Fachkräfte dringend gesucht werden.', term: 'This is because skilled workers are in high demand.' },
+  { id: 'en-b17', deck: 'eb', noMC: true, q: 'Folge: Deshalb müssen viele Arbeitnehmer unbezahlten Urlaub nehmen.', term: 'As a result, many employees have to take unpaid leave.' },
+  { id: 'en-b18', deck: 'eb', noMC: true, q: '⬆ Folge: Neuankömmlinge sind anfangs oft allein, weshalb Offenheit so wichtig ist.', term: 'Newcomers are often alone at first, which is why it is essential to be open.' },
+  { id: 'en-b19', deck: 'eb', noMC: true, q: 'Beispiel: Zum Beispiel ist „How are you?“ nur eine Begrüßung.', term: 'For example, “How are you?” is just a greeting.' },
+  { id: 'en-b20', deck: 'eb', noMC: true, q: 'Wichtig: Es ist wichtig, Vorurteile abzulegen.', term: 'It is essential to leave your prejudices behind.' },
+  { id: 'en-b21', deck: 'eb', noMC: true, q: '⬆ Upgrade-Satz: Offenheit ist nicht nur hilfreich, sondern auch die Grundlage für Freundschaften.', term: 'Not only is openness helpful, but it is also the basis for friendships.' },
+  { id: 'en-b22', deck: 'eb', noMC: true, q: 'Empfehlung: Wenn du also überlegst auszuwandern, raten die Autorinnen, zuerst dort Urlaub zu machen.', term: 'So if you are thinking of emigrating, the authors’ advice is to spend a holiday there first.' },
+  { id: 'en-b23', deck: 'eb', noMC: true, q: 'Artikel · Schluss: Insgesamt zeigt der Blogpost, dass die USA viele Chancen bieten.', term: 'All in all, the blog post shows that the US offers many opportunities.' },
+  { id: 'en-b24', deck: 'eb', noMC: true, q: 'E-Mail locker · Schluss: Ich hoffe, das hilft dir! Viele Grüße', term: 'I hope this helps! Best wishes,' },
+  { id: 'en-b25', deck: 'eb', noMC: true, q: 'E-Mail formell · Schluss: Ich hoffe, Sie finden diese Informationen nützlich. Mit freundlichen Grüßen', term: 'I hope you find this information useful. Yours sincerely,' },
 ];
