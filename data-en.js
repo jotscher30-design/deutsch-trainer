@@ -9,6 +9,7 @@ const DECKS_EN = [
   { id: 'ei', name: 'The US – Introduction (23.10.)', short: 'US intro', color: '#1971c2', q: 'English?', def: 2 },
   { id: 'ew', name: 'The world\'s stake in American democracy (20.10.)', short: 'World\'s stake', color: '#5f3dc4', q: 'English?', def: 2 },
   { id: 'ep', name: 'Political systems US & UK (25.09.)', short: 'US & UK', color: '#2f9e44', q: 'English?', def: 1 },
+  { id: 'eo', name: 'One dream to unite them all (13.11.)', short: 'One dream', color: '#e8590c', q: 'English?', def: 2 },
 ];
 
 const CARDS_EN = [
@@ -194,4 +195,28 @@ const CARDS_EN = [
   { id: 'en-p64', deck: 'ep', q: 'Staatenbund; Nationengemeinschaft', term: 'Commonwealth', ex: 'The British Commonwealth maintains links with countries which used to be part of the British Empire.' },
   { id: 'en-p65', deck: 'ep', q: 'mit ererbtem Titel', term: 'hereditary', def: 'passed on from older to younger family members', fx: 'hereditary peer/monarch/disease\nhereditary → inheritance (n)\n→ to inherit (v)' },
   { id: 'en-p66', deck: 'ep', q: 'Zustimmung; Genehmigung', term: 'assent', ex: 'The Queen gives Royal Assent to a bill passed by Parliament, making it into a law.', fx: 'assent = approval = consent' },
+
+  /* ───────────── ONE DREAM TO UNITE THEM ALL (13.11.) ─────────────
+     Ohne Dubletten: from rags to riches (en-u50), viable (en-w07), to grant (en-u33) */
+  { id: 'en-o01', deck: 'eo', q: 'sozialer Aufstieg', term: 'upward mobility', def: 'the ability to move to a higher social class', ex: 'Americans used to believe that upward mobility was possible for anyone who worked hard enough.', fx: 'upward mobility = upwardly mobile' },
+  { id: 'en-o02', deck: 'eo', q: 'auf etw. (besonders) stolz sein; sich auf etw. zugutehalten', term: 'to pride oneself on sth', ex: 'We pride ourselves on the quality of our products.', fx: 'to pride oneself → pride (n) → proud (adj)' },
+  { id: 'en-o03', deck: 'eo', q: 'veränderlich', term: 'fluid', ex: 'In a fluid society, you’re not stuck in the same social class as your parents.' },
+  { id: 'en-o04', deck: 'eo', q: 'Gesellschaft', term: 'society', ex: 'In American society successful people who work hard are held in high esteem.', fx: 'society → social (adj)' },
+  { id: 'en-o05', deck: 'eo', q: 'reichlich', term: 'abundant', def: 'present in large amounts', ex: 'Although the wealthy enjoy a very abundant lifestyle, others struggle.', fx: 'abundant → abundance (n)' },
+  { id: 'en-o06', deck: 'eo', q: 'Leistungsgesellschaft', term: 'meritocracy', ex: 'In a meritocracy employees are chosen based on their abilities and skills, not their social position.', fx: 'meritocracy → merit (n) → to merit (v)' },
+  { id: 'en-o07', deck: 'eo', q: 'etw. (von jdm.) übernehmen; etw. (von jdm.) erben', term: 'to inherit sth (from sb)', ex: 'After I inherited my grandmother’s savings, I could put a down payment on a house.', fx: 'to inherit → inheritance (n)' },
+  { id: 'en-o08', deck: 'eo', q: 'Verteilung', term: 'distribution', ex: 'You should make sure that the distribution of work is even.', fx: 'distribution → to distribute (v)' },
+  { id: 'en-o09', deck: 'eo', q: 'wohnen; wohnhaft sein', term: 'to reside in (fml)', ex: 'If you reside in a rich area, you’ll have access to better schools and other facilities.', fx: 'to reside = to live\nto reside → resident (n) → residential (adj)' },
+  { id: 'en-o10', deck: 'eo', q: 'verarmt', term: 'impoverished', ex: 'More impoverished neighbourhoods might struggle to offer decent education, which leads to inequality.', fx: 'impoverished = poor\nimpoverished ↔ wealthy\nimpoverished (adj) → poverty (n)' },
+  { id: 'en-o11', deck: 'eo', q: 'schief; verzerrt', term: 'skewed', def: 'here: unfair/unjust', ex: 'Because the distribution is so skewed, a small number of people hold most of the wealth.' },
+  { id: 'en-o12', deck: 'eo', q: 'unbeugsamer Individualismus', term: 'rugged individualism', ex: 'Rugged individualism is drilled into Americans from an early age. You don’t ask for help unless you really need it.' },
+  { id: 'en-o13', deck: 'eo', q: 'Selbstständigkeit; Eigenständigkeit', term: 'self-reliance', ex: 'Self-reliance is seen as a positive trait in America – you achieve everything thanks to your own hard work.', fx: 'self-reliance ↔ reliance on sb/sth\nself-reliance → self-reliant (adj) → to rely on sth/sb (v)' },
+  { id: 'en-o14', deck: 'eo', q: 'verbessern', term: 'to ameliorate (fml)', ex: 'Although the welfare state can help to ameliorate some inequality, Americans tend to defund such programmes.' },
+  { id: 'en-o15', deck: 'eo', q: 'Ungerechtigkeit', term: 'inequity', ex: 'With universal healthcare, you avoid any inequities in the system.', fx: 'inequity = unfairness = injustice' },
+  { id: 'en-o16', deck: 'eo', q: 'heterogen; verschiedenartig', term: 'heterogeneous', ex: 'Heterogeneous societies are comprised of many different ethnic groups and cultures.', fx: 'heterogeneous ↔ homogeneous' },
+  { id: 'en-o17', deck: 'eo', q: 'Fähigkeit; Talent; Eignung', term: 'aptitude', def: 'a natural skill or ability', ex: 'She has a real aptitude for the sciences, so she might become a physicist.' },
+  { id: 'en-o18', deck: 'eo', q: 'überzeugen', term: 'to convince', def: 'to persuade sb that you’re right', ex: 'Try to convince the committee why you should receive the scholarship.', fx: 'to convince → convincing (adj) → conviction (n)' },
+  { id: 'en-o19', deck: 'eo', q: 'ein Gleichgewicht schaffen/herstellen', term: 'to strike a balance', def: 'to reach a point where two different things have equal importance', ex: 'It’s important to strike a balance between work life and family life.' },
+  { id: 'en-o20', deck: 'eo', q: 'Bewertung', term: 'assessment', ex: 'He took a test at the assessment centre and got the result he needed to apply for university.', fx: 'assessment = evaluation\nassessment → to assess (v)' },
+  { id: 'en-o21', deck: 'eo', q: 'Eindruck', term: 'impression', ex: 'During the interview I got the strong impression that the candidate was confident and capable.', fx: 'to make a good/great (first) impression\nto get/have/give sb the impression that\nimpression → to impress (v) → impressive (adj)' },
 ];

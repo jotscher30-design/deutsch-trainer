@@ -15,7 +15,7 @@
     // exam: bis zum Vortag kommt jede Karte nochmal; was am Vortag wackelt, kommt am Prüfungsmorgen
     ph: { id: 'ph', name: 'Physik', decks: DECKS_PH, cards: CARDS_PH, mc: 0.55, npd: 6, goal: 15, exam: '2026-11-10', examName: 'Ex Plattenkondensator' },
     // direct: neue Karten ohne Lern-Ansicht sofort abfragen (Vokabeln kennt Jonas vom Blatt); ask = Fragezeile beim Aufdecken
-    en: { id: 'en', name: 'Englisch', decks: DECKS_EN, cards: CARDS_EN, mc: 0, npd: 15, goal: 25, direct: true, ask: 'Auf Englisch?' },
+    en: { id: 'en', name: 'Englisch', decks: DECKS_EN, cards: CARDS_EN, mc: 0, npd: 15, goal: 25, direct: true, ask: 'Auf Englisch?', exam: '2026-11-24', examName: 'KA Englisch' },
     rel: { id: 'rel', name: 'Religion', decks: DECKS_REL, cards: CARDS_REL, mc: 0, npd: 6, goal: 12, exam: '2026-11-13', examName: 'Klausur Religion' },
   };
   const ALL_DECKS = [...DECKS, ...DECKS_PH, ...DECKS_EN, ...DECKS_REL];
